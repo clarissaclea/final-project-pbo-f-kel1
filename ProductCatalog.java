@@ -43,16 +43,43 @@ public class ProductCatalog extends JFrame {
         JTextField nameField = new JTextField();
         JTextField priceField = new JTextField();
         JTextField categoryField = new JTextField();
-        JTextField productionDateField = new JTextField("yyyy-mm-dd");
-        JTextField expiryDateField = new JTextField("yyyy-mm-dd");
+
+        // Drop-down tanggal produksi
+        JComboBox<Integer> prodYearBox = new JComboBox<>();
+        JComboBox<Integer> prodMonthBox = new JComboBox<>();
+        JComboBox<Integer> prodDayBox = new JComboBox<>();
+
+        // Drop-down tanggal kadaluarsa
+        JComboBox<Integer> expYearBox = new JComboBox<>();
+        JComboBox<Integer> expMonthBox = new JComboBox<>();
+        JComboBox<Integer> expDayBox = new JComboBox<>();
+
+        int currentYear = LocalDate.now().getYear();
+        for (int y = currentYear - 5; y <= currentYear + 5; y++) {
+            prodYearBox.addItem(y);
+            expYearBox.addItem(y);
+        }
+        for (int m = 1; m <= 12; m++) {
+            prodMonthBox.addItem(m);
+            expMonthBox.addItem(m);
+        }
+        for (int d = 1; d <= 31; d++) {
+            prodDayBox.addItem(d);
+            expDayBox.addItem(d);
+        }
+
         JButton addButton = new JButton("➕ Tambah Produk");
 
         Font inputFont = new Font("Segoe UI", Font.PLAIN, 14);
         nameField.setFont(inputFont);
         priceField.setFont(inputFont);
         categoryField.setFont(inputFont);
-        productionDateField.setFont(inputFont);
-        expiryDateField.setFont(inputFont);
+        prodYearBox.setFont(inputFont);
+        prodMonthBox.setFont(inputFont);
+        prodDayBox.setFont(inputFont);
+        expYearBox.setFont(inputFont);
+        expMonthBox.setFont(inputFont);
+        expDayBox.setFont(inputFont);
         addButton.setFont(new Font("Segoe UI", Font.BOLD, 14));
         addButton.setBackground(new Color(46, 139, 87));
         addButton.setForeground(Color.WHITE);
@@ -61,11 +88,8 @@ public class ProductCatalog extends JFrame {
             String name = nameField.getText().trim();
             String priceText = priceField.getText().trim();
             String category = categoryField.getText().trim();
-            String productionDate = productionDateField.getText().trim();
-            String expiryDate = expiryDateField.getText().trim();
 
-            if (name.isEmpty() || priceText.isEmpty() || category.isEmpty()
-                    || productionDate.isEmpty() || expiryDate.isEmpty()) {
+            if (name.isEmpty() || priceText.isEmpty() || category.isEmpty()) {
                 JOptionPane.showMessageDialog(this, "Semua field harus diisi");
                 return;
             }
@@ -73,6 +97,17 @@ public class ProductCatalog extends JFrame {
             try {
                 double price = Double.parseDouble(priceText);
                 String kodeProduk = String.format("P%03d", productCounter++);
+
+                String productionDate = String.format("%04d-%02d-%02d",
+                        prodYearBox.getSelectedItem(),
+                        prodMonthBox.getSelectedItem(),
+                        prodDayBox.getSelectedItem());
+
+                String expiryDate = String.format("%04d-%02d-%02d",
+                        expYearBox.getSelectedItem(),
+                        expMonthBox.getSelectedItem(),
+                        expDayBox.getSelectedItem());
+
                 Product product = new Product(kodeProduk, name, price, category, productionDate, expiryDate);
                 products.add(product);
 
@@ -90,8 +125,12 @@ public class ProductCatalog extends JFrame {
                 nameField.setText("");
                 priceField.setText("");
                 categoryField.setText("");
-                productionDateField.setText("yyyy-mm-dd");
-                expiryDateField.setText("yyyy-mm-dd");
+                prodYearBox.setSelectedIndex(5);
+                prodMonthBox.setSelectedIndex(0);
+                prodDayBox.setSelectedIndex(0);
+                expYearBox.setSelectedIndex(5);
+                expMonthBox.setSelectedIndex(0);
+                expDayBox.setSelectedIndex(0);
             } catch (NumberFormatException ex) {
                 JOptionPane.showMessageDialog(this, "Harga harus berupa angka");
             }
@@ -108,10 +147,28 @@ public class ProductCatalog extends JFrame {
         inputPanel.add(priceField);
         inputPanel.add(new JLabel("Kategori Produk:", JLabel.RIGHT));
         inputPanel.add(categoryField);
+
+        JPanel prodDatePanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
+        prodDatePanel.setBackground(new Color(245, 250, 255));
+        prodDatePanel.add(prodYearBox);
+        prodDatePanel.add(new JLabel("-"));
+        prodDatePanel.add(prodMonthBox);
+        prodDatePanel.add(new JLabel("-"));
+        prodDatePanel.add(prodDayBox);
+
+        JPanel expDatePanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
+        expDatePanel.setBackground(new Color(245, 250, 255));
+        expDatePanel.add(expYearBox);
+        expDatePanel.add(new JLabel("-"));
+        expDatePanel.add(expMonthBox);
+        expDatePanel.add(new JLabel("-"));
+        expDatePanel.add(expDayBox);
+
         inputPanel.add(new JLabel("Tanggal Produksi:", JLabel.RIGHT));
-        inputPanel.add(productionDateField);
+        inputPanel.add(prodDatePanel);
         inputPanel.add(new JLabel("Tanggal Kadaluarsa:", JLabel.RIGHT));
-        inputPanel.add(expiryDateField);
+        inputPanel.add(expDatePanel);
+
         inputPanel.add(new JLabel());
         inputPanel.add(addButton);
 
@@ -121,7 +178,6 @@ public class ProductCatalog extends JFrame {
         setVisible(true);
     }
 
-    // Menghitung status berdasarkan tanggal Exp
     private String getStatusKadaluarsa(String expiryDateStr) {
         try {
             LocalDate today = LocalDate.now();
@@ -166,3 +222,4 @@ public class ProductCatalog extends JFrame {
         SwingUtilities.invokeLater(ProductCatalog::new);
     }
 }
+
