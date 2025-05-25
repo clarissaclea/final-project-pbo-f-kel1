@@ -13,12 +13,10 @@ public class QeemlaLoginForm extends JFrame {
         setUndecorated(false);
         setLayout(new GridLayout(1, 2));
 
-        // Panel kiri: branding Qeemla
         JPanel leftPanel = new JPanel();
         leftPanel.setBackground(new Color(6, 94, 84));
         leftPanel.setLayout(new BorderLayout());
 
-        // Tambahkan logo
         ImageIcon logoIcon = new ImageIcon("assets/logo_qeemla.png");
         Image logo = logoIcon.getImage().getScaledInstance(200, 200, Image.SCALE_SMOOTH);
         JLabel logoLabel = new JLabel(new ImageIcon(logo));
@@ -40,7 +38,6 @@ public class QeemlaLoginForm extends JFrame {
 
         leftPanel.add(brandingPanel, BorderLayout.CENTER);
 
-        // Panel kanan: form login
         JPanel rightPanel = new JPanel();
         rightPanel.setBackground(Color.WHITE);
         rightPanel.setLayout(new GridBagLayout());
@@ -61,7 +58,6 @@ public class QeemlaLoginForm extends JFrame {
         loginButton.setForeground(Color.WHITE);
         loginButton.setFocusPainted(false);
 
-        // Aksi tombol login
         loginButton.addActionListener(e -> {
             String email = emailField.getText();
             String password = new String(passwordField.getPassword());
@@ -69,7 +65,6 @@ public class QeemlaLoginForm extends JFrame {
             if (email.equalsIgnoreCase("admin@qeemla.com") && password.equals("1234")) {
                 JOptionPane.showMessageDialog(this, "Login Berhasil", "Welcome", JOptionPane.INFORMATION_MESSAGE);
                 dispose();
-                // Ambil nama dari email
                 String username = email.split("@")[0];
                 new DashboardMenu(username);
             } else {
@@ -77,7 +72,6 @@ public class QeemlaLoginForm extends JFrame {
             }
         });
 
-        // Tambah komponen ke form login
         gbc.insets = new Insets(10, 10, 10, 10);
         gbc.gridx = 0; gbc.gridy = 0; gbc.gridwidth = 2;
         rightPanel.add(titleLabel, gbc);
@@ -98,7 +92,6 @@ public class QeemlaLoginForm extends JFrame {
 
         setVisible(true);
     }
-
     public static void main(String[] args) {
         SwingUtilities.invokeLater(QeemlaLoginForm::new);
     }
