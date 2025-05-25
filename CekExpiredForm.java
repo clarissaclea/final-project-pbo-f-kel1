@@ -122,7 +122,7 @@ public class CekExpiredForm extends JFrame {
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
-          
+           // TODO: Ganti dengan daftar produk nyata dari database atau file
             List<Product> dummyList = List.of();
             new CekExpiredForm(dummyList).setVisible(true);
         });
