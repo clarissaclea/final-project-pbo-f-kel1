@@ -20,7 +20,6 @@ public class InputProductForm extends JFrame {
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
-        // Gunakan JPanel custom dengan background gambar
         BackgroundPanel background = new BackgroundPanel("assets/logo_qeemla.png");
         setContentPane(background);
         background.setLayout(new BorderLayout());
@@ -34,6 +33,7 @@ public class InputProductForm extends JFrame {
         titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 22));
         titleLabel.setForeground(new Color(6, 94, 84));
         titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
         mainPanel.add(titleLabel);
         mainPanel.add(Box.createRigidArea(new Dimension(0, 20)));
 
@@ -60,16 +60,15 @@ public class InputProductForm extends JFrame {
         for (int i = 0; i < labels.length; i++) {
             gbc.gridx = 0;
             gbc.gridy = i;
-            JLabel lbl = new JLabel(labels[i]);
-            lbl.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-            lbl.setForeground(Color.BLACK);
-            formPanel.add(lbl, gbc);
+            JLabel label = new JLabel(labels[i]);
+            label.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+            label.setForeground(Color.BLACK);
+            formPanel.add(label, gbc);
 
             gbc.gridx = 1;
             formPanel.add(inputs[i], gbc);
         }
 
-        // Foto Produk
         gbc.gridx = 0;
         gbc.gridy = labels.length;
         JLabel photoText = new JLabel("Foto Produk");
@@ -77,12 +76,11 @@ public class InputProductForm extends JFrame {
         formPanel.add(photoText, gbc);
 
         gbc.gridx = 1;
-        JButton btnPhoto = new JButton("Pilih Gambar");
-        btnPhoto.addActionListener(e -> pilihFoto());
-        formPanel.add(btnPhoto, gbc);
+        JButton btnPilihFoto = new JButton("Pilih Gambar");
+        btnPilihFoto.addActionListener(e -> pilihFoto());
+        formPanel.add(btnPilihFoto, gbc);
 
         gbc.gridy++;
-        gbc.gridx = 1;
         photoLabel = new JLabel();
         photoLabel.setPreferredSize(new Dimension(120, 120));
         photoLabel.setBorder(BorderFactory.createLineBorder(Color.GRAY));
@@ -105,6 +103,7 @@ public class InputProductForm extends JFrame {
         mainPanel.add(btnSimpan);
 
         background.add(mainPanel, BorderLayout.CENTER);
+
         setVisible(true);
     }
 
@@ -128,11 +127,10 @@ public class InputProductForm extends JFrame {
             String kategori = tfKategori.getText().trim();
             Date tglProduksi = (Date) spinnerProduksi.getValue();
             Date tglExpired = (Date) spinnerExpired.getValue();
-
             String photoPath = selectedPhoto != null ? selectedPhoto.getAbsolutePath() : null;
 
-            Product p = new Product(kode, nama, harga, kategori, tglProduksi, tglExpired, photoPath);
-            productList.add(p);
+            Product produkBaru = new Product(kode, nama, harga, kategori, tglProduksi, tglExpired, photoPath);
+            productList.add(produkBaru);
 
             JOptionPane.showMessageDialog(this, "Produk berhasil ditambahkan!\nFoto: " +
                     (selectedPhoto != null ? selectedPhoto.getName() : "Tidak ada"));
