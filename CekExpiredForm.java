@@ -39,4 +39,27 @@ public class CekExpiredForm extends JFrame {
 
         add(new JScrollPane(table), BorderLayout.CENTER);
 
+        // Tombol untuk scan barcode
+        JButton scanButton = new JButton("Scan Barcode");
+        scanButton.addActionListener(e -> openWebcamScanner());
 
+        add(scanButton, BorderLayout.SOUTH);
+    }
+
+    private void openWebcamScanner() {
+        Webcam webcam = Webcam.getDefault();
+
+        if (webcam == null) {
+            JOptionPane.showMessageDialog(this, "Tidak ada webcam terdeteksi.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        webcam.setViewSize(new Dimension(640, 480));
+        WebcamPanel panel = new WebcamPanel(webcam);
+        panel.setFPSDisplayed(true);
+
+        JFrame window = new JFrame("Scan Barcode");
+        window.add(panel);
+        window.setResizable(true);
+        window.pack();
+        window.setVisible(true);
