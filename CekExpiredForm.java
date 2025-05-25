@@ -63,3 +63,66 @@ public class CekExpiredForm extends JFrame {
         window.setResizable(true);
         window.pack();
         window.setVisible(true);
+
+            new Thread(() -> {
+            while (true) {
+                BufferedImage image = webcam.getImage();
+                if (image == null) continue;
+
+                LuminanceSource source = new BufferedImageLuminanceSource(image);
+                BinaryBitmap bitmap = new BinaryBitmap(new HybridBinarizer(source));
+
+                try {
+                    Result result = new MultiFormatReader().decode(bitmap);
+                    if (result != null) {
+                        String data = result.getText(); // format: NamaProduk|2025-06-01
+                        String[] parts = data.split("\\|");
+
+                        if (parts.length == 2) {
+                            LocalDate tanggal = LocalDate.parse(parts[1], DateTimeFormatter.ISO_DATE);
+                            String pesan = tanggal.isBefore(LocalDate.now())
+                                    ? "Produk " + parts[0] + " sudah kedaluwarsa!"
+                                    : "Produk " + parts[0] + " masih aman.";
+                            JOptionPane.showMessageDialog(null, pesan);
+                        } else {
+                            JOptionPane.showMessageDialog(null, "Format barcode tidak valid.");
+                        }
+
+                        webcam.close();
+                        window.dispose();
+                        break;
+                    }
+                } catch (Exception ignored) {
+                    // Jika gagal membaca barcode, lanjutkan loop
+                }
+
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException ignored) {
+                }
+            }
+        }).start();
+    }
+
+    private String getStatusKadaluarsa(java.util.Date expiryDate) {
+        try {
+            LocalDate today = LocalDate.now();
+            LocalDate expiryLocalDate = expiryDate.toInstant()
+                    .atZone(java.time.ZoneId.systemDefault())
+                    .toLocalDate();
+
+            long days = java.time.temporal.ChronoUnit.DAYS.between(today, expiryLocalDate);
+            return days < 0 ? "❌ Sudah Kedaluwarsa" : "✅ Belum Kedaluwarsa";
+        } catch (Exception e) {
+            return "⛔ Format Tanggal Salah";
+        }
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> {
+            // TODO: Ganti dengan daftar produk nyata dari database atau file
+            List<Product> dummyList = List.of();
+            new CekExpiredForm(dummyList).setVisible(true);
+        });
+    }
+}
