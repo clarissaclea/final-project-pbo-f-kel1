@@ -18,23 +18,23 @@ public class QeemlaLoginForm extends JFrame {
         leftPanel.setLayout(new BorderLayout());
 
         ImageIcon logoIcon = new ImageIcon("assets/logo_qeemla.png");
-        Image logo = logoIcon.getImage().getScaledInstance(200, 200, Image.SCALE_SMOOTH);
-        JLabel logoLabel = new JLabel(new ImageIcon(logo));
+        Image scaledLogo = logoIcon.getImage().getScaledInstance(200, 200, Image.SCALE_SMOOTH);
+        JLabel logoLabel = new JLabel(new ImageIcon(scaledLogo));
         logoLabel.setHorizontalAlignment(JLabel.CENTER);
-
+        
         JLabel brandLabel = new JLabel("QEEMLA", JLabel.CENTER);
         brandLabel.setFont(new Font("Georgia", Font.BOLD, 36));
         brandLabel.setForeground(Color.WHITE);
 
-        JLabel tagline = new JLabel("Skin and Body Care", JLabel.CENTER);
-        tagline.setFont(new Font("Segoe UI", Font.PLAIN, 16));
-        tagline.setForeground(Color.WHITE);
+        JLabel taglineLabel = new JLabel("Skin and Body Care", JLabel.CENTER);
+        taglineLabel.setFont(new Font("Segoe UI", Font.PLAIN, 16));
+        taglineLabel.setForeground(Color.WHITE);
 
         JPanel brandingPanel = new JPanel(new GridLayout(3, 1));
         brandingPanel.setOpaque(false);
         brandingPanel.add(logoLabel);
         brandingPanel.add(brandLabel);
-        brandingPanel.add(tagline);
+        brandingPanel.add(taglineLabel);
 
         leftPanel.add(brandingPanel, BorderLayout.CENTER);
 
@@ -42,6 +42,7 @@ public class QeemlaLoginForm extends JFrame {
         rightPanel.setBackground(Color.WHITE);
         rightPanel.setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(10, 10, 10, 10); // Padding
 
         JLabel titleLabel = new JLabel("SIGN IN TO QEEMLA");
         titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 20));
@@ -72,18 +73,21 @@ public class QeemlaLoginForm extends JFrame {
             }
         });
 
-        gbc.insets = new Insets(10, 10, 10, 10);
         gbc.gridx = 0; gbc.gridy = 0; gbc.gridwidth = 2;
         rightPanel.add(titleLabel, gbc);
-        gbc.gridwidth = 1;
-        gbc.gridy++;
+
+        gbc.gridwidth = 1; gbc.gridy++;
         rightPanel.add(emailLabel, gbc);
+
         gbc.gridx = 1;
         rightPanel.add(emailField, gbc);
+
         gbc.gridx = 0; gbc.gridy++;
         rightPanel.add(passwordLabel, gbc);
+
         gbc.gridx = 1;
         rightPanel.add(passwordField, gbc);
+
         gbc.gridx = 0; gbc.gridy++; gbc.gridwidth = 2;
         rightPanel.add(loginButton, gbc);
 
@@ -92,6 +96,7 @@ public class QeemlaLoginForm extends JFrame {
 
         setVisible(true);
     }
+
     public static void main(String[] args) {
         SwingUtilities.invokeLater(QeemlaLoginForm::new);
     }
