@@ -7,7 +7,7 @@ public class Product {
     private String category;
     private Date productionDate;
     private Date expiryDate;
-    private String photoPath;  // Path foto produk
+    private String photoPath;
 
     public Product(String code, String name, double price, String category, Date productionDate, Date expiryDate, String photoPath) {
         this.code = code;
