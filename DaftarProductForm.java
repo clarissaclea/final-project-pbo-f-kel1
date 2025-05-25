@@ -36,7 +36,7 @@ public class DaftarProductForm extends JFrame {
                 imageIcon = new ImageIcon(new BufferedImage(80, 80, BufferedImage.TYPE_INT_ARGB));
             }
 
-            data[i][0] = imageIcon; // Foto
+            data[i][0] = imageIcon; 
             data[i][1] = p.getCode();
             data[i][2] = p.getName();
             data[i][3] = String.format("Rp%,.2f", p.getPrice());
@@ -76,7 +76,7 @@ public class DaftarProductForm extends JFrame {
         header.setForeground(Color.WHITE);
 
         table.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        table.setRowHeight(90); // tinggi baris agar gambar muat
+        table.setRowHeight(90); 
         table.setGridColor(new Color(180, 180, 180));
 
         JScrollPane scrollPane = new JScrollPane(table);
@@ -100,4 +100,5 @@ public class DaftarProductForm extends JFrame {
         add(panel);
         setVisible(true);
     }
+}
 }
