@@ -28,3 +28,15 @@ public class CekExpiredForm extends JFrame {
         model = new DefaultTableModel(new String[]{"Kode", "Nama", "Exp", "Status"}, 0);
         table = new JTable(model);
         table.setRowHeight(25);
+
+          // Filter hanya produk yang sudah kadaluwarsa
+        for (Product p : allProducts) {
+            String status = getStatusKadaluarsa(p.getExpiryDate());
+            if (status.contains("Kedaluwarsa")) {
+                model.addRow(new Object[]{p.getCode(), p.getName(), p.getExpiryDate(), status});
+            }
+        }
+
+        add(new JScrollPane(table), BorderLayout.CENTER);
+
+
