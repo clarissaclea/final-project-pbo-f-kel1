@@ -1,14 +1,9 @@
-import java.util.HashMap;
-
-public class Database {
-    private static HashMap<String, String> users = new HashMap<>();
-
-    static {
-        users.put("admin", "123");
-        users.put("user", "pass");
-    }
-
-    public static boolean authenticate(String username, String password) {
-        return users.containsKey(username) && users.get(username).equals(password);
+public class Main {
+    public static void main(String[] args) {
+        boolean isAuthenticated = Database.authenticate("admin", "123");
+        System.out.println("Authenticated: " + isAuthenticated);  // Output: Authenticated: true
+        
+        isAuthenticated = Database.authenticate("user", "wrongpass");
+        System.out.println("Authenticated: " + isAuthenticated);  // Output: Authenticated: false
     }
 }
