@@ -1,20 +1,13 @@
-import java.util.HashMap;
-import java.util.Map;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 
-public class Database {
-    // Simulasi tabel pengguna seperti di SQL
-    private static Map<String, String> users = new HashMap<>();
+public class DatabaseConnection {
+    private static final String URL = "jdbc:mysql://localhost:3306/qeemla_db";
+    private static final String USER = "root";
+    private static final String PASSWORD = "";
 
-    // Static block untuk mengisi "data" seperti data di database
-    static {
-        users.put("admin", "123");
-        users.put("user", "abc");
-        users.put("john", "pass123");
-    }
-
-    // Fungsi autentikasi
-    public static boolean authenticate(String username, String password) {
-        // Mengecek apakah username ada dan password sesuai
-        return users.containsKey(username) && users.get(username).equals(password);
+    public static Connection getConnection() throws SQLException {
+        return DriverManager.getConnection(URL, USER, PASSWORD);
     }
 }
