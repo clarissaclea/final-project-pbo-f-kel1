@@ -11,7 +11,7 @@ public class webcamtest {
             System.out.println("Tidak ada webcam ditemukan.");
             return;
         }
-
+        
         webcam.setViewSize(new java.awt.Dimension(640, 480));
         WebcamPanel panel = new WebcamPanel(webcam);
 
