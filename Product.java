@@ -9,7 +9,13 @@ public class Product {
     private Date expiryDate;
     private String photoPath;
 
-    public Product(String code, String name, double price, String category, Date productionDate, Date expiryDate, String photoPath) {
+    public Product(String code,
+                    String name,
+                    double price,
+                    String category,
+                   Date productionDate,
+                   Date expiryDate,
+                   String photoPath) {
         this.code = code;
         this.name = name;
         this.price = price;
