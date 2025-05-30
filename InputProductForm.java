@@ -194,15 +194,15 @@ public class InputProductForm extends JFrame {
             tfHarga.setText(String.valueOf(productInfo.price));
             tfKategori.setText(productInfo.category);
 
-            // Set dates
+            // Set data
             LocalDate today = LocalDate.now();
             LocalDate expirationDate = today.plusYears(1);
             spinnerProduksi.setValue(Date.from(today.atStartOfDay(ZoneId.systemDefault()).toInstant()));
             spinnerExpired.setValue(Date.from(expirationDate.atStartOfDay(ZoneId.systemDefault()).toInstant()));
 
             // Set photo
-            selectedPhoto = null; // Reset previous selection
-            photoLabel.setIcon(null); // Clear previous image
+            selectedPhoto = null; 
+            photoLabel.setIcon(null);
 
             try {
                 // Attempt to load image from resources/filesystem
