@@ -11,12 +11,11 @@ public class ExpiryChecker extends JFrame {
 
         JTextArea area = new JTextArea();
         area.setEditable(false);
-
-        // Contoh data produk dan tanggal expired
+        
         ArrayList<ProdukKadaluarsa> daftarProduk = new ArrayList<>();
         daftarProduk.add(new ProdukKadaluarsa("Toner A", "2025-06-01"));
         daftarProduk.add(new ProdukKadaluarsa("Serum B", "2025-05-15"));
-        daftarProduk.add(new ProdukKadaluarsa("Moisturizer C", "2025-05-08")); // Akan expired 1 hari lagi
+        daftarProduk.add(new ProdukKadaluarsa("Moisturizer C", "2025-05-08"));
 
         StringBuilder tampil = new StringBuilder();
         tampil.append("Daftar Produk:\n\n");
@@ -47,7 +46,6 @@ public class ExpiryChecker extends JFrame {
         setVisible(true);
     }
 
-    // Inner class Produk
     class ProdukKadaluarsa {
         String nama;
         String tanggalExp;
