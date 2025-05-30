@@ -26,12 +26,10 @@ public class CekExpiredForm extends JFrame {
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setLayout(new BorderLayout());
 
-        // Tabel produk kadaluwarsa
         model = new DefaultTableModel(new String[]{"Kode", "Nama", "Exp", "Status"}, 0);
         table = new JTable(model);
         table.setRowHeight(25);
 
-        // Filter hanya produk yang sudah kadaluwarsa
         for (Product p : allProducts) {
             String status = getStatusKadaluarsa(p.getExpiryDate());
             if (status.contains("Kedaluwarsa")) {
@@ -41,11 +39,9 @@ public class CekExpiredForm extends JFrame {
 
         add(new JScrollPane(table), BorderLayout.CENTER);
 
-        // Tombol untuk scan barcode
         JButton scanButton = new JButton("Scan Barcode");
         scanButton.addActionListener(e -> openWebcamScanner());
 
-        // Tombol untuk upload gambar barcode
         JButton uploadButton = new JButton("Upload Barcode");
         uploadButton.addActionListener(e -> openUploadDialog());
 
@@ -74,7 +70,6 @@ public class CekExpiredForm extends JFrame {
         window.setResizable(true);
         window.pack();
 
-        // Set size dan posisi supaya lebih pas
         window.setSize(700, 550);
         window.setLocationRelativeTo(null);
         window.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -103,7 +98,7 @@ hints.put(DecodeHintType.TRY_HARDER, Boolean.TRUE);
 
 Result result = new MultiFormatReader().decode(bitmap, hints);
                     if (result != null) {
-                        String data = result.getText(); // format: Kode|Nama|YYYY-MM-DD
+                        String data = result.getText();
                         System.out.println("Barcode terbaca: " + data);
 
                         String[] parts = data.split("\\|");
@@ -116,10 +111,9 @@ Result result = new MultiFormatReader().decode(bitmap, hints);
                                     ? "❌ Sudah Kedaluwarsa"
                                     : "✅ Belum Kedaluwarsa";
 
-                            Toolkit.getDefaultToolkit().beep(); // Bunyi bip
+                            Toolkit.getDefaultToolkit().beep();
                             JOptionPane.showMessageDialog(window, "Produk " + namaProduk + " " + status);
 
-                            // Tambahkan langsung ke tabel
                             SwingUtilities.invokeLater(() -> {
                                 model.addRow(new Object[]{
                                         kode,
@@ -140,7 +134,6 @@ Result result = new MultiFormatReader().decode(bitmap, hints);
 
                     Thread.sleep(300);
                 } catch (NotFoundException e) {
-                    // barcode tidak ditemukan, lanjut saja
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -163,7 +156,7 @@ Result result = new MultiFormatReader().decode(bitmap, hints);
                 BinaryBitmap bitmap = new BinaryBitmap(new HybridBinarizer(source));
 
                 Result decodeResult = new MultiFormatReader().decode(bitmap);
-                String data = decodeResult.getText(); // format: Kode|Nama|YYYY-MM-DD
+                String data = decodeResult.getText();
 
                 System.out.println("Barcode terbaca dari upload: " + data);
 
@@ -176,10 +169,9 @@ Result result = new MultiFormatReader().decode(bitmap, hints);
                             ? "❌ Sudah Kedaluwarsa"
                             : "✅ Belum Kedaluwarsa";
 
-                    Toolkit.getDefaultToolkit().beep(); // Bunyi bip
+                    Toolkit.getDefaultToolkit().beep();
                     JOptionPane.showMessageDialog(this, "Produk " + namaProduk + " " + status);
 
-                    // Tambahkan langsung ke tabel
                     model.addRow(new Object[]{
                             kode,
                             namaProduk,
@@ -216,7 +208,6 @@ Result result = new MultiFormatReader().decode(bitmap, hints);
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
-            // Dummy kosong, ganti dengan data asli
             List<Product> dummyList = List.of();
             new CekExpiredForm(dummyList).setVisible(true);
         });
