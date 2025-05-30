@@ -9,7 +9,7 @@ import java.net.URL;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.HashMap; // Added for predefined products
+import java.util.HashMap;
 import java.util.Map;
 import java.awt.Dimension;
 
