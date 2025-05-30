@@ -46,7 +46,7 @@ public class DashboardMenu extends JFrame {
         inputBtn.addActionListener(e -> new InputProductForm(productList));
         listBtn.addActionListener(e -> new DaftarProductForm(productList));
         // Tambahkan aksi sesuai kebutuhan untuk expired dan reminder
-        cekExpBtn.addActionListener(e -> new ExpiryChecker(productList).setVisible(true));
+        cekExpBtn.addActionListener(e -> new CekExpiredForm (productList).setVisible(true));
         remindBtn.addActionListener(e -> {
         String reminder = ExpiryChecker.generateReminder(productList);
         JOptionPane.showMessageDialog(this, reminder, "Pengingat Produk Expired", JOptionPane.INFORMATION_MESSAGE);
