@@ -9,13 +9,8 @@ public class Product {
     private Date expiryDate;
     private String photoPath;
 
-    public Product(String code,
-                    String name,
-                    double price,
-                    String category,
-                   Date productionDate,
-                   Date expiryDate,
-                   String photoPath) {
+    public Product(String code, String name, double price, String category,
+                   Date productionDate, Date expiryDate, String photoPath) {
         this.code = code;
         this.name = name;
         this.price = price;
@@ -25,11 +20,25 @@ public class Product {
         this.photoPath = photoPath;
     }
 
-    public String getCode() { return code; }
-    public String getName() { return name; }
-    public double getPrice() { return price; }
-    public String getCategory() { return category; }
-    public Date getProductionDate() { return productionDate; }
-    public Date getExpiryDate() { return expiryDate; }
-    public String getPhotoPath() { return photoPath; }
+    public String getCode(){
+        return code;
+    }
+    public String getName(){
+        return name;
+    }
+    public double getPrice(){
+        return price;
+    }
+    public String getCategory(){
+        return category;
+    }
+    public Date getProductionDate(){
+        return productionDate;
+    }
+    public Date getExpiryDate(){
+        return expiryDate;
+    }
+    public String getPhotoPath(){
+        return photoPath;
+    }
 }
