@@ -13,7 +13,6 @@ public class DaftarProductForm extends JFrame {
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
-        // Background image
         JLabel background = new JLabel(new ImageIcon("assets/logo_qeemla.png"));
         setContentPane(background);
         background.setLayout(new BorderLayout());
@@ -26,13 +25,11 @@ public class DaftarProductForm extends JFrame {
         for (int i = 0; i < productList.size(); i++) {
             Product p = productList.get(i);
 
-            // Gambar thumbnail
             ImageIcon imageIcon = null;
             if (p.getPhotoPath() != null && new File(p.getPhotoPath()).exists()) {
                 Image img = new ImageIcon(p.getPhotoPath()).getImage().getScaledInstance(80, 80, Image.SCALE_SMOOTH);
                 imageIcon = new ImageIcon(img);
             } else {
-                // Kalau foto tidak ada, beri gambar kosong berukuran 80x80
                 imageIcon = new ImageIcon(new BufferedImage(80, 80, BufferedImage.TYPE_INT_ARGB));
             }
 
@@ -100,5 +97,4 @@ public class DaftarProductForm extends JFrame {
         add(panel);
         setVisible(true);
     }
-}
 }
