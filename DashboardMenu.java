@@ -14,7 +14,6 @@ public class DashboardMenu extends JFrame {
         setResizable(false);
         setLayout(new BorderLayout());
 
-        // Top Panel (Header)
         JPanel topPanel = new JPanel(new BorderLayout());
         topPanel.setBackground(new Color(6, 94, 84));
         topPanel.setBorder(BorderFactory.createEmptyBorder(15, 20, 15, 20));
@@ -31,7 +30,6 @@ public class DashboardMenu extends JFrame {
         topPanel.add(logoLabel, BorderLayout.WEST);
         topPanel.add(welcomeLabel, BorderLayout.CENTER);
 
-        // Center Panel (Menu Button)
         JPanel centerPanel = new JPanel();
         centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.Y_AXIS));
         centerPanel.setBackground(Color.WHITE);
@@ -56,7 +54,6 @@ public class DashboardMenu extends JFrame {
         centerPanel.add(Box.createVerticalStrut(15)); centerPanel.add(remindBtn);
         centerPanel.add(Box.createVerticalStrut(10));
 
-        // Footer (opsional)
         JPanel bottomPanel = new JPanel();
         bottomPanel.setBackground(Color.WHITE);
         JLabel versionLabel = new JLabel("Qeemla Skin & Body Care © 2025");
@@ -64,7 +61,6 @@ public class DashboardMenu extends JFrame {
         versionLabel.setForeground(new Color(120, 120, 120));
         bottomPanel.add(versionLabel);
 
-        // Add to Frame
         add(topPanel, BorderLayout.NORTH);
         add(centerPanel, BorderLayout.CENTER);
         add(bottomPanel, BorderLayout.SOUTH);
@@ -89,4 +85,3 @@ public class DashboardMenu extends JFrame {
         SwingUtilities.invokeLater(() -> new DashboardMenu("admin"));
     }
 }
-
