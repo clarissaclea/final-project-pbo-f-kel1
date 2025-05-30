@@ -1,34 +1,33 @@
 import javax.swing.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
+import java.util.List;
 
 public class ExpiryChecker extends JFrame {
-    public ExpiryChecker() {
+    public ExpiryChecker(List<Product> productList) {
         setTitle("Cek Kedaluwarsa Produk");
         setSize(550, 350);
         setLocationRelativeTo(null);
 
         JTextArea area = new JTextArea();
         area.setEditable(false);
-        
-        ArrayList<ProdukKadaluarsa> daftarProduk = new ArrayList<>();
-        daftarProduk.add(new ProdukKadaluarsa("Toner A", "2025-06-01"));
-        daftarProduk.add(new ProdukKadaluarsa("Serum B", "2025-05-15"));
-        daftarProduk.add(new ProdukKadaluarsa("Moisturizer C", "2025-05-08"));
 
         StringBuilder tampil = new StringBuilder();
         tampil.append("Daftar Produk:\n\n");
 
         LocalDate hariIni = LocalDate.now();
-        DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-        for (ProdukKadaluarsa produk : daftarProduk) {
-            LocalDate tglExp = LocalDate.parse(produk.tanggalExp, format);
-            long selisihHari = java.time.temporal.ChronoUnit.DAYS.between(hariIni, tglExp);
+        for (Product p : productList) {
+            LocalDate expDate = p.getExpiryDate().toInstant()
+                      .atZone(java.time.ZoneId.systemDefault())
+                      .toLocalDate();
 
-            tampil.append("- ").append(produk.nama)
-                  .append(" (Exp: ").append(tglExp).append(")\n");
+            long selisihHari = java.time.temporal.ChronoUnit.DAYS.between(hariIni, expDate);
+
+            tampil.append("- ").append(p.getName())
+                  .append(" (Exp: ").append(expDate.format(formatter)).append(")\n");
+
 
             if (selisihHari >= 0 && selisihHari <= 7) {
                 tampil.append("  ⚠ *BUANG segera* - kedaluwarsa dalam ")
@@ -45,14 +44,34 @@ public class ExpiryChecker extends JFrame {
         add(new JScrollPane(area));
         setVisible(true);
     }
+    public static String generateReminder(List<Product> productList) {
+    StringBuilder output = new StringBuilder();
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    LocalDate today = LocalDate.now();
 
-    class ProdukKadaluarsa {
-        String nama;
-        String tanggalExp;
+    boolean adaReminder = false;
 
-        ProdukKadaluarsa(String nama, String tanggalExp) {
-            this.nama = nama;
-            this.tanggalExp = tanggalExp;
+    for (Product p : productList) {
+        LocalDate expDate = p.getExpiryDate().toInstant()
+                              .atZone(java.time.ZoneId.systemDefault())
+                              .toLocalDate();
+        long daysLeft = java.time.temporal.ChronoUnit.DAYS.between(today, expDate);
+
+        if (daysLeft <= 30 && daysLeft >= 0) {
+            adaReminder = true;
+            output.append("- ").append(p.getName())
+                  .append(" (Exp: ").append(expDate.format(formatter)).append(")\n");
+
+
+            if (daysLeft <= 7) {
+                output.append("  ⚠ *BUANG segera* - kedaluwarsa dalam ").append(daysLeft).append(" hari.\n\n");
+            } else {
+                output.append("  🔔 *PROMOSIKAN* - expired dalam ").append(daysLeft).append(" hari.\n\n");
+            }
         }
     }
+
+    return adaReminder ? output.toString() : "Tidak ada produk yang mendekati expired.";
+}
+
 }
