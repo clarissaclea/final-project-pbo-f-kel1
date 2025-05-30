@@ -13,36 +13,30 @@ public class QeemlaLoginForm extends JFrame {
         setUndecorated(false);
         setLayout(new GridLayout(1, 2));
 
+        // Panel kiri: branding Qeemla
         JPanel leftPanel = new JPanel();
         leftPanel.setBackground(new Color(6, 94, 84));
         leftPanel.setLayout(new BorderLayout());
 
-        ImageIcon logoIcon = new ImageIcon("assets/logo_qeemla.png");
-        Image scaledLogo = logoIcon.getImage().getScaledInstance(200, 200, Image.SCALE_SMOOTH);
-        JLabel logoLabel = new JLabel(new ImageIcon(scaledLogo));
+        // Tambahkan logo
+        ImageIcon logoIcon = new ImageIcon("assets/LogoQeemla.png");
+        Image logo = logoIcon.getImage().getScaledInstance(200, 200, Image.SCALE_SMOOTH);
+        JLabel logoLabel = new JLabel(new ImageIcon(logo));
         logoLabel.setHorizontalAlignment(JLabel.CENTER);
-        
-        JLabel brandLabel = new JLabel("QEEMLA", JLabel.CENTER);
-        brandLabel.setFont(new Font("Georgia", Font.BOLD, 36));
-        brandLabel.setForeground(Color.WHITE);
+        logoLabel.setVerticalAlignment(JLabel.CENTER);
 
-        JLabel taglineLabel = new JLabel("Skin and Body Care", JLabel.CENTER);
-        taglineLabel.setFont(new Font("Segoe UI", Font.PLAIN, 16));
-        taglineLabel.setForeground(Color.WHITE);
 
         JPanel brandingPanel = new JPanel(new GridLayout(3, 1));
         brandingPanel.setOpaque(false);
         brandingPanel.add(logoLabel);
-        brandingPanel.add(brandLabel);
-        brandingPanel.add(taglineLabel);
 
         leftPanel.add(brandingPanel, BorderLayout.CENTER);
 
+        // Panel kanan: form login
         JPanel rightPanel = new JPanel();
         rightPanel.setBackground(Color.WHITE);
         rightPanel.setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(10, 10, 10, 10);
 
         JLabel titleLabel = new JLabel("SIGN IN TO QEEMLA");
         titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 20));
@@ -59,6 +53,7 @@ public class QeemlaLoginForm extends JFrame {
         loginButton.setForeground(Color.WHITE);
         loginButton.setFocusPainted(false);
 
+        // Aksi tombol login
         loginButton.addActionListener(e -> {
             String email = emailField.getText();
             String password = new String(passwordField.getPassword());
@@ -66,6 +61,7 @@ public class QeemlaLoginForm extends JFrame {
             if (email.equalsIgnoreCase("admin@qeemla.com") && password.equals("1234")) {
                 JOptionPane.showMessageDialog(this, "Login Berhasil", "Welcome", JOptionPane.INFORMATION_MESSAGE);
                 dispose();
+                // Ambil nama dari email
                 String username = email.split("@")[0];
                 new DashboardMenu(username);
             } else {
@@ -73,21 +69,19 @@ public class QeemlaLoginForm extends JFrame {
             }
         });
 
+        // Tambah komponen ke form login
+        gbc.insets = new Insets(10, 10, 10, 10);
         gbc.gridx = 0; gbc.gridy = 0; gbc.gridwidth = 2;
         rightPanel.add(titleLabel, gbc);
-
-        gbc.gridwidth = 1; gbc.gridy++;
+        gbc.gridwidth = 1;
+        gbc.gridy++;
         rightPanel.add(emailLabel, gbc);
-
         gbc.gridx = 1;
         rightPanel.add(emailField, gbc);
-
         gbc.gridx = 0; gbc.gridy++;
         rightPanel.add(passwordLabel, gbc);
-
         gbc.gridx = 1;
         rightPanel.add(passwordField, gbc);
-
         gbc.gridx = 0; gbc.gridy++; gbc.gridwidth = 2;
         rightPanel.add(loginButton, gbc);
 
