@@ -26,7 +26,7 @@ public class InputProductForm extends JFrame {
     private JLabel photoLabel;
     private File selectedPhoto;
 
-    // --- Predefined Product Data ---
+    // --- Data Produk yang Telah Ditentukan Sebelumnya ---
     private static class PredefinedProductInfo {
         String name;
         double price;
