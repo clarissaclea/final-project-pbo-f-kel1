@@ -43,15 +43,15 @@ public class InputProductForm extends JFrame {
 
     private static final Map<String, PredefinedProductInfo> PREDEFINED_PRODUCTS = new HashMap<>();
     static {
-        // Populate with your predefined products
-        // Ensure these image paths are correct and accessible relative to your project structure
-        // For example, if "assets" is in your resources folder or at the root of your classpath.
+       
+        //ini buat barcode 
+    
         PREDEFINED_PRODUCTS.put("3211", new PredefinedProductInfo("Serum Pencerah Wajah Pro", 175000, "Serum", "assets/product_serum_alpha.png"));
         PREDEFINED_PRODUCTS.put("3212", new PredefinedProductInfo("Lotion Badan Lembap Extra", 95000, "Lotion", "assets/product_lotion_berry.png"));
         PREDEFINED_PRODUCTS.put("8992772090012", new PredefinedProductInfo("Facial Wash Brightening", 65000, "Pembersih Wajah", "assets/product_facewash_bright.png"));
-        // Add more products as needed: PREDEFINED_PRODUCTS.put("BARCODE_CODE", new PredefinedProductInfo(...));
+        
     }
-    // --- End of Predefined Product Data ---
+  
 
     public InputProductForm(List<Product> productList) {
         this.productList = productList;
