@@ -205,15 +205,14 @@ public class InputProductForm extends JFrame {
             photoLabel.setIcon(null);
 
             try {
-                // Attempt to load image from resources/filesystem
+                // pilih barcode dari komputer
                 URL imageUrl = getClass().getClassLoader().getResource(productInfo.imagePath);
                 if (imageUrl != null) {
-                    selectedPhoto = new File(imageUrl.toURI()); // For consistency with file chooser
+                    selectedPhoto = new File(imageUrl.toURI()); 
                     ImageIcon icon = new ImageIcon(imageUrl);
                     Image img = icon.getImage().getScaledInstance(100, 100, Image.SCALE_SMOOTH);
                     photoLabel.setIcon(new ImageIcon(img));
                 } else {
-                    // Fallback if resource not found, try as direct file path
                     File imageFile = new File(productInfo.imagePath);
                     if (imageFile.exists()) {
                         selectedPhoto = imageFile;
@@ -233,9 +232,9 @@ public class InputProductForm extends JFrame {
 
             JOptionPane.showMessageDialog(this, "Produk '" + productInfo.name + "' dimuat otomatis.", "Barcode Terdeteksi", JOptionPane.INFORMATION_MESSAGE);
         } else {
-            // If barcode is not predefined, just fill the code and set dates
+            
             tfBarcode.setText(cleanBarcodeData);
-            tfNama.setText(""); // Clear other fields
+            tfNama.setText(""); 
             tfHarga.setText("");
             tfKategori.setText("");
             photoLabel.setIcon(null);
@@ -356,12 +355,7 @@ public class InputProductForm extends JFrame {
                 JOptionPane.showMessageDialog(this, "Semua field harus diisi (kecuali foto jika memang tidak ada)!", "Input Tidak Lengkap", JOptionPane.WARNING_MESSAGE);
                 return;
             }
-            // No longer strictly checking for numeric code if predefined codes might be alphanumeric
-            // if (!kode.matches("\\d+")) {
-            //      JOptionPane.showMessageDialog(this, "Kode Barcode harus berupa angka.", "Input Tidak Valid", JOptionPane.WARNING_MESSAGE);
-            //     return;
-            // }
-
+        
             double harga = Double.parseDouble(tfHarga.getText().trim());
             String kategori = tfKategori.getText().trim();
             Date tglProduksi = (Date) spinnerProduksi.getValue();
@@ -373,17 +367,13 @@ public class InputProductForm extends JFrame {
             }
 
             String photoPath = selectedPhoto != null ? selectedPhoto.getAbsolutePath() : null;
-            // If selectedPhoto is null BUT it was a predefined product, photoPath might need to come from PREDEFINED_PRODUCTS
-            // However, selectedPhoto should have been set by processBarcodeData if image was found.
-            // If selectedPhoto is null, it means either no photo was pre-defined, pre-defined photo wasn't found, or user hasn't picked one.
-
             Product p = new Product(kode, nama, harga, kategori, tglProduksi, tglExpired, photoPath);
             productList.add(p);
 
             JOptionPane.showMessageDialog(this, "Produk berhasil ditambahkan!\nKode: " + kode + "\nNama: " + nama +
                     (photoPath != null ? "\nFoto: " + new File(photoPath).getName() : "\nFoto: Tidak ada"));
 
-            // Clear fields for next input
+            //  Hapus bidang untuk input berikutnya
             tfBarcode.setText("");
             tfNama.setText("");
             tfHarga.setText("");
