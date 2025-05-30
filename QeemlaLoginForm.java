@@ -42,7 +42,7 @@ public class QeemlaLoginForm extends JFrame {
         rightPanel.setBackground(Color.WHITE);
         rightPanel.setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(10, 10, 10, 10); // Padding
+        gbc.insets = new Insets(10, 10, 10, 10);
 
         JLabel titleLabel = new JLabel("SIGN IN TO QEEMLA");
         titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 20));
