@@ -1,18 +1,8 @@
-import com.github.sarxos.webcam.Webcam;
-import com.github.sarxos.webcam.WebcamPanel;
-import com.google.zxing.*;
-import com.google.zxing.common.HybridBinarizer;
-import com.google.zxing.client.j2se.BufferedImageLuminanceSource;
-
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.awt.image.BufferedImage;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.awt.Dimension;
-
 
 public class CekExpiredForm extends JFrame {
 
@@ -42,64 +32,6 @@ public class CekExpiredForm extends JFrame {
         add(new JScrollPane(table), BorderLayout.CENTER);
     }
 
-    private void openWebcamScanner() {
-        Webcam webcam = Webcam.getDefault();
-
-        if (webcam == null) {
-            JOptionPane.showMessageDialog(this, "Tidak ada webcam terdeteksi.", "Error", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-
-        webcam.setViewSize(new Dimension(640, 480));
-        WebcamPanel panel = new WebcamPanel(webcam);
-        panel.setFPSDisplayed(true);
-
-        JFrame window = new JFrame("Scan Barcode");
-        window.add(panel);
-        window.setResizable(true);
-        window.pack();
-        window.setVisible(true);
-
-        new Thread(() -> {
-            while (true) {
-                BufferedImage image = webcam.getImage();
-                if (image == null) continue;
-
-                LuminanceSource source = new BufferedImageLuminanceSource(image);
-                BinaryBitmap bitmap = new BinaryBitmap(new HybridBinarizer(source));
-
-                try {
-                    Result result = new MultiFormatReader().decode(bitmap);
-                    if (result != null) {
-                        String data = result.getText(); // format: NamaProduk|2025-06-01
-                        String[] parts = data.split("\\|");
-
-                        if (parts.length == 2) {
-                            LocalDate tanggal = LocalDate.parse(parts[1], DateTimeFormatter.ISO_DATE);
-                            String pesan = tanggal.isBefore(LocalDate.now())
-                                    ? "Produk " + parts[0] + " sudah kedaluwarsa!"
-                                    : "Produk " + parts[0] + " masih aman.";
-                            JOptionPane.showMessageDialog(null, pesan);
-                        } else {
-                            JOptionPane.showMessageDialog(null, "Format barcode tidak valid.");
-                        }
-
-                        webcam.close();
-                        window.dispose();
-                        break;
-                    }
-                } catch (Exception ignored) {
-                    // Jika gagal membaca barcode, lanjutkan loop
-                }
-
-                try {
-                    Thread.sleep(500);
-                } catch (InterruptedException ignored) {
-                }
-            }
-        }).start();
-    }
-
     private String getStatusKadaluarsa(java.util.Date expiryDate) {
         try {
             LocalDate today = LocalDate.now();
@@ -122,4 +54,3 @@ public class CekExpiredForm extends JFrame {
         });
     }
 }
-
