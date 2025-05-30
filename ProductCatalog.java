@@ -39,17 +39,14 @@ public class ProductCatalog extends JFrame {
 
         JScrollPane scrollPane = new JScrollPane(productTable);
 
-        // Input fields
         JTextField nameField = new JTextField();
         JTextField priceField = new JTextField();
         JTextField categoryField = new JTextField();
 
-        // Drop-down tanggal produksi
         JComboBox<Integer> prodYearBox = new JComboBox<>();
         JComboBox<Integer> prodMonthBox = new JComboBox<>();
         JComboBox<Integer> prodDayBox = new JComboBox<>();
 
-        // Drop-down tanggal kadaluarsa
         JComboBox<Integer> expYearBox = new JComboBox<>();
         JComboBox<Integer> expMonthBox = new JComboBox<>();
         JComboBox<Integer> expDayBox = new JComboBox<>();
@@ -136,7 +133,6 @@ public class ProductCatalog extends JFrame {
             }
         });
 
-        // Panel input
         JPanel inputPanel = new JPanel(new GridLayout(6, 2, 10, 8));
         inputPanel.setBorder(BorderFactory.createEmptyBorder(10, 15, 10, 15));
         inputPanel.setBackground(new Color(245, 250, 255));
@@ -222,4 +218,3 @@ public class ProductCatalog extends JFrame {
         SwingUtilities.invokeLater(ProductCatalog::new);
     }
 }
-
