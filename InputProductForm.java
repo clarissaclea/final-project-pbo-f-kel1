@@ -20,7 +20,7 @@ public class InputProductForm extends JFrame {
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
-        BackgroundPanel background = new BackgroundPanel("assets/logo_qeemla.png");
+        BackgroundPanel background = new BackgroundPanel("assets/LogoQeemla.png");
         setContentPane(background);
         background.setLayout(new BorderLayout());
 
