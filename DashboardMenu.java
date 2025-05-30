@@ -45,7 +45,10 @@ public class DashboardMenu extends JFrame {
         inputBtn.addActionListener(e -> new InputProductForm(productList));
         listBtn.addActionListener(e -> new DaftarProductForm(productList));
         cekExpBtn.addActionListener(e -> new CekExpiredForm(productList).setVisible(true));
-        remindBtn.addActionListener(e -> JOptionPane.showMessageDialog(this, "Fitur reminder belum diimplementasi."));
+        remindBtn.addActionListener(e -> {
+            String reminder = ExpiryChecker.generateReminder(productList);
+            JOptionPane.showMessageDialog(this, reminder, "Pengingat Produk Expired", JOptionPane.INFORMATION_MESSAGE);
+            });
 
         centerPanel.add(Box.createVerticalStrut(10)); centerPanel.add(inputBtn);
         centerPanel.add(Box.createVerticalStrut(15)); centerPanel.add(listBtn);
