@@ -13,7 +13,8 @@ public class DaftarProductForm extends JFrame {
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
-        JLabel background = new JLabel(new ImageIcon("assets/logo_qeemla.png"));
+        // Background image
+        JLabel background = new JLabel(new ImageIcon("assets/LogoQeemla.png"));
         setContentPane(background);
         background.setLayout(new BorderLayout());
 
@@ -25,15 +26,17 @@ public class DaftarProductForm extends JFrame {
         for (int i = 0; i < productList.size(); i++) {
             Product p = productList.get(i);
 
+            // Gambar thumbnail
             ImageIcon imageIcon = null;
             if (p.getPhotoPath() != null && new File(p.getPhotoPath()).exists()) {
                 Image img = new ImageIcon(p.getPhotoPath()).getImage().getScaledInstance(80, 80, Image.SCALE_SMOOTH);
                 imageIcon = new ImageIcon(img);
             } else {
+                // Kalau foto tidak ada, beri gambar kosong berukuran 80x80
                 imageIcon = new ImageIcon(new BufferedImage(80, 80, BufferedImage.TYPE_INT_ARGB));
             }
 
-            data[i][0] = imageIcon; 
+            data[i][0] = imageIcon; // Foto
             data[i][1] = p.getCode();
             data[i][2] = p.getName();
             data[i][3] = String.format("Rp%,.2f", p.getPrice());
@@ -73,7 +76,7 @@ public class DaftarProductForm extends JFrame {
         header.setForeground(Color.WHITE);
 
         table.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        table.setRowHeight(90); 
+        table.setRowHeight(90); // tinggi baris agar gambar muat
         table.setGridColor(new Color(180, 180, 180));
 
         JScrollPane scrollPane = new JScrollPane(table);
