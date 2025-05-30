@@ -31,7 +31,7 @@ public class InputProductForm extends JFrame {
         String name;
         double price;
         String category;
-        String imagePath; // Relative path to image, e.g., "assets/product_3211.png"
+        String imagePath;
 
         public PredefinedProductInfo(String name, double price, String category, String imagePath) {
             this.name = name;
