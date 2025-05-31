@@ -10,7 +10,6 @@ public class QeemlaLoginForm extends JFrame {
         setSize(700, 400);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
-        setUndecorated(false);
         setLayout(new GridLayout(1, 2));
 
         // Panel kiri: branding Qeemla
@@ -18,18 +17,24 @@ public class QeemlaLoginForm extends JFrame {
         leftPanel.setBackground(new Color(6, 94, 84));
         leftPanel.setLayout(new BorderLayout());
 
-        // Tambahkan logo
-        ImageIcon logoIcon = new ImageIcon("assets/LogoQeemla.png");
+        ImageIcon logoIcon = new ImageIcon("assets/logo_qeemla.png");
         Image logo = logoIcon.getImage().getScaledInstance(200, 200, Image.SCALE_SMOOTH);
         JLabel logoLabel = new JLabel(new ImageIcon(logo));
         logoLabel.setHorizontalAlignment(JLabel.CENTER);
-        logoLabel.setVerticalAlignment(JLabel.CENTER);
 
+        JLabel brandLabel = new JLabel("QEEMLA", JLabel.CENTER);
+        brandLabel.setFont(new Font("Georgia", Font.BOLD, 36));
+        brandLabel.setForeground(Color.WHITE);
+
+        JLabel tagline = new JLabel("Skin and Body Care", JLabel.CENTER);
+        tagline.setFont(new Font("Segoe UI", Font.PLAIN, 16));
+        tagline.setForeground(Color.WHITE);
 
         JPanel brandingPanel = new JPanel(new GridLayout(3, 1));
         brandingPanel.setOpaque(false);
         brandingPanel.add(logoLabel);
-
+        brandingPanel.add(brandLabel);
+        brandingPanel.add(tagline);
         leftPanel.add(brandingPanel, BorderLayout.CENTER);
 
         // Panel kanan: form login
@@ -60,10 +65,14 @@ public class QeemlaLoginForm extends JFrame {
 
             if (email.equalsIgnoreCase("admin@qeemla.com") && password.equals("1234")) {
                 JOptionPane.showMessageDialog(this, "Login Berhasil", "Welcome", JOptionPane.INFORMATION_MESSAGE);
+
+                // Tutup form login
                 dispose();
-                // Ambil nama dari email
+
+                // Buka dashboard
                 String username = email.split("@")[0];
-                new DashboardMenu(username);
+                DashboardMenu dashboard = new DashboardMenu(username);
+                dashboard.setVisible(true);
             } else {
                 JOptionPane.showMessageDialog(this, "Login Gagal", "Email atau password salah!", JOptionPane.ERROR_MESSAGE);
             }
@@ -85,6 +94,7 @@ public class QeemlaLoginForm extends JFrame {
         gbc.gridx = 0; gbc.gridy++; gbc.gridwidth = 2;
         rightPanel.add(loginButton, gbc);
 
+        // Gabungkan panel kiri dan kanan
         add(leftPanel);
         add(rightPanel);
 
