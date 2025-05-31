@@ -1,5 +1,6 @@
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -7,7 +8,7 @@ public class DashboardMenu extends JFrame {
     private List<Product> productList = new ArrayList<>();
 
     public DashboardMenu(String username) {
-        setTitle("QEEMLA Skin&Body Care");
+        setTitle("QEEMLA Dashboard");
         setSize(500, 450);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -19,8 +20,8 @@ public class DashboardMenu extends JFrame {
         topPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
         // Logo
-        ImageIcon logoIcon = new ImageIcon("assets/LogoQeemla.png");
-        Image logoImage = logoIcon.getImage().getScaledInstance(100, 100, Image.SCALE_SMOOTH);
+        ImageIcon logoIcon = new ImageIcon("assets/logo_qeemla.png");
+        Image logoImage = logoIcon.getImage().getScaledInstance(60, 60, Image.SCALE_SMOOTH);
         JLabel logoLabel = new JLabel(new ImageIcon(logoImage));
 
         // Welcome label
@@ -46,12 +47,8 @@ public class DashboardMenu extends JFrame {
         inputBtn.addActionListener(e -> new InputProductForm(productList));
         listBtn.addActionListener(e -> new DaftarProductForm(productList));
         // Tambahkan aksi sesuai kebutuhan untuk expired dan reminder
-        cekExpBtn.addActionListener(e -> new CekExpiredForm (productList).setVisible(true));
-        remindBtn.addActionListener(e -> {
-        String reminder = ExpiryChecker.generateReminder(productList);
-        JOptionPane.showMessageDialog(this, reminder, "Pengingat Produk Expired", JOptionPane.INFORMATION_MESSAGE);
-        });
-
+        cekExpBtn.addActionListener(e -> new CekExpiredForm(productList));
+        remindBtn.addActionListener(e -> JOptionPane.showMessageDialog(this, "Fitur reminder belum diimplementasi."));
 
         centerPanel.add(inputBtn);
         centerPanel.add(listBtn);
@@ -63,12 +60,6 @@ public class DashboardMenu extends JFrame {
         add(centerPanel, BorderLayout.CENTER);
 
         setVisible(true);
-
-        // Reminder saat aplikasi dibuka
-        String reminder = ExpiryChecker.generateReminder(productList);
-        if (!reminder.equals("Tidak ada produk yang mendekati expired.")) {
-            JOptionPane.showMessageDialog(this, reminder, "Pengingat Produk Expired", JOptionPane.WARNING_MESSAGE);
-        }
     }
 
     // Utility method untuk membuat tombol dengan style branding
