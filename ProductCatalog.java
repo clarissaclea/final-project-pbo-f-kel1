@@ -14,7 +14,7 @@ public class ProductCatalog extends JFrame {
     private int productCounter = 1;
 
     public ProductCatalog() {
-        setTitle("Katalog Produk");
+        setTitle("Katalog Produk Qemmla Skin and Body Care");
         setSize(900, 500);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
