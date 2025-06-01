@@ -5,7 +5,7 @@ import java.util.List;
 
 public class ExpiryChecker extends JFrame {
     public ExpiryChecker(List<Product> productList) {
-        setTitle("Cek Kedaluwarsa Produk");
+        setTitle("Cek Expired Produk");
         setSize(550, 350);
         setLocationRelativeTo(null);
 
@@ -30,10 +30,10 @@ public class ExpiryChecker extends JFrame {
 
 
             if (selisihHari >= 0 && selisihHari <= 7) {
-                tampil.append("  ⚠ *BUANG segera* - kedaluwarsa dalam ")
+                tampil.append("  ⚠ *BUANG segera* - Expired dalam ")
                       .append(selisihHari).append(" hari.\n");
             } else if (selisihHari > 7 && selisihHari <= 30) {
-                tampil.append("  🔔 *PROMOkan* - segera jual, expired dalam ")
+                tampil.append("  🔔 *PROMOkan* - segera jual, Expired dalam ")
                       .append(selisihHari).append(" hari.\n");
             }
 
@@ -64,9 +64,9 @@ public class ExpiryChecker extends JFrame {
 
 
             if (daysLeft <= 7) {
-                output.append("  ⚠ *BUANG segera* - kedaluwarsa dalam ").append(daysLeft).append(" hari.\n\n");
+                output.append("  ⚠ *BUANG segera* - Expired dalam ").append(daysLeft).append(" hari.\n\n");
             } else {
-                output.append("  🔔 *PROMOSIKAN* - expired dalam ").append(daysLeft).append(" hari.\n\n");
+                output.append("  🔔 *PROMOSIKAN* - Expired dalam ").append(daysLeft).append(" hari.\n\n");
             }
         }
     }
