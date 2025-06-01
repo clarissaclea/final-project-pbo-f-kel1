@@ -10,18 +10,18 @@ public class CekExpiredForm extends JFrame {
     private DefaultTableModel model;
 
     public CekExpiredForm(List<Product> allProducts) {
-        setTitle("⏰ Produk Kedaluwarsa");
+        setTitle("⏰Produk Expired");
         setSize(700, 400);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setLayout(new BorderLayout());
 
-        // Tabel produk kadaluwarsa
+        // Tabel produk exp
         model = new DefaultTableModel(new String[]{"Kode", "Nama", "Exp", "Status"}, 0);
         table = new JTable(model);
         table.setRowHeight(25);
 
-        // Filter hanya produk yang sudah kadaluwarsa
+        // Filter hanya produk yang sudah exp
         for (Product p : allProducts) {
             String status = getStatusKadaluarsa(p.getExpiryDate());
             if (status.contains("Kedaluwarsa")) {
@@ -40,7 +40,7 @@ public class CekExpiredForm extends JFrame {
                     .toLocalDate();
 
             long days = java.time.temporal.ChronoUnit.DAYS.between(today, expiryLocalDate);
-            return days < 0 ? "❌ Sudah Kedaluwarsa" : "✅ Belum Kedaluwarsa";
+            return days < 0 ? "❌ Sudah Expired" : "✅ Belum Expired";
         } catch (Exception e) {
             return "⛔ Format Tanggal Salah";
         }
