@@ -26,7 +26,6 @@ public class InputProductForm extends JFrame {
     private JLabel photoLabel;
     private File selectedPhoto;
 
-    // --- Data Produk yang Telah Ditentukan Sebelumnya ---
     private static class PredefinedProductInfo {
         String name;
         double price;
@@ -43,8 +42,6 @@ public class InputProductForm extends JFrame {
 
     private static final Map<String, PredefinedProductInfo> PREDEFINED_PRODUCTS = new HashMap<>();
     static {
-       
-        //ini buat barcode 
     
         PREDEFINED_PRODUCTS.put("3211", new PredefinedProductInfo("Serum Pencerah Wajah Pro", 175000, "Serum", "assets/product_serum_alpha.png"));
         PREDEFINED_PRODUCTS.put("3212", new PredefinedProductInfo("Lotion Badan Lembap Extra", 95000, "Lotion", "assets/product_lotion_berry.png"));
@@ -194,18 +191,15 @@ public class InputProductForm extends JFrame {
             tfHarga.setText(String.valueOf(productInfo.price));
             tfKategori.setText(productInfo.category);
 
-            // Set data
             LocalDate today = LocalDate.now();
             LocalDate expirationDate = today.plusYears(1);
             spinnerProduksi.setValue(Date.from(today.atStartOfDay(ZoneId.systemDefault()).toInstant()));
             spinnerExpired.setValue(Date.from(expirationDate.atStartOfDay(ZoneId.systemDefault()).toInstant()));
 
-            // Set photo
             selectedPhoto = null; 
             photoLabel.setIcon(null);
 
             try {
-                // pilih barcode dari komputer
                 URL imageUrl = getClass().getClassLoader().getResource(productInfo.imagePath);
                 if (imageUrl != null) {
                     selectedPhoto = new File(imageUrl.toURI()); 
@@ -373,7 +367,6 @@ public class InputProductForm extends JFrame {
             JOptionPane.showMessageDialog(this, "Produk berhasil ditambahkan!\nKode: " + kode + "\nNama: " + nama +
                     (photoPath != null ? "\nFoto: " + new File(photoPath).getName() : "\nFoto: Tidak ada"));
 
-            //  Hapus bidang untuk input berikutnya
             tfBarcode.setText("");
             tfNama.setText("");
             tfHarga.setText("");
@@ -401,7 +394,6 @@ public class InputProductForm extends JFrame {
                     backgroundImage = new ImageIcon(imgUrl).getImage();
                 } else {
                     System.err.println("Background image not found (classpath): " + imagePath);
-                    // Try direct path as a fallback if not in resources
                     File directFile = new File(imagePath);
                     if (directFile.exists()){
                         backgroundImage = new ImageIcon(directFile.getAbsolutePath()).getImage();
