@@ -12,7 +12,6 @@ public class QeemlaLoginForm extends JFrame {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLayout(new GridLayout(1, 2));
 
-        // Panel kiri: branding Qeemla
         JPanel leftPanel = new JPanel();
         leftPanel.setBackground(new Color(6, 94, 84));
         leftPanel.setLayout(new BorderLayout());
@@ -37,7 +36,6 @@ public class QeemlaLoginForm extends JFrame {
         brandingPanel.add(tagline);
         leftPanel.add(brandingPanel, BorderLayout.CENTER);
 
-        // Panel kanan: form login
         JPanel rightPanel = new JPanel();
         rightPanel.setBackground(Color.WHITE);
         rightPanel.setLayout(new GridBagLayout());
@@ -58,7 +56,6 @@ public class QeemlaLoginForm extends JFrame {
         loginButton.setForeground(Color.WHITE);
         loginButton.setFocusPainted(false);
 
-        // Aksi tombol login
         loginButton.addActionListener(e -> {
             String email = emailField.getText();
             String password = new String(passwordField.getPassword());
@@ -66,19 +63,16 @@ public class QeemlaLoginForm extends JFrame {
             if (email.equalsIgnoreCase("admin@qeemla.com") && password.equals("1234")) {
                 JOptionPane.showMessageDialog(this, "Login Berhasil", "Welcome", JOptionPane.INFORMATION_MESSAGE);
 
-                // Tutup form login
                 dispose();
 
-                // Buka dashboard
                 String username = email.split("@")[0];
                 DashboardMenu dashboard = new DashboardMenu(username);
                 dashboard.setVisible(true);
             } else {
-                JOptionPane.showMessageDialog(this, "Login Gagal", "Email atau password salah!", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Login Gagal!", "Email atau password salah!", JOptionPane.ERROR_MESSAGE);
             }
         });
 
-        // Tambah komponen ke form login
         gbc.insets = new Insets(10, 10, 10, 10);
         gbc.gridx = 0; gbc.gridy = 0; gbc.gridwidth = 2;
         rightPanel.add(titleLabel, gbc);
@@ -94,7 +88,6 @@ public class QeemlaLoginForm extends JFrame {
         gbc.gridx = 0; gbc.gridy++; gbc.gridwidth = 2;
         rightPanel.add(loginButton, gbc);
 
-        // Gabungkan panel kiri dan kanan
         add(leftPanel);
         add(rightPanel);
 
