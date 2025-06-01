@@ -8,7 +8,7 @@ public class webcamtest {
         Webcam webcam = Webcam.getDefault();
 
         if (webcam == null) {
-            System.out.println("Tidak ada webcam ditemukan.");
+            System.out.println("Tidak ada webcam yang ditemukan.");
             return;
         }
         
