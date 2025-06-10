@@ -1,18 +1,22 @@
+// File: InputProductForm.java
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
 import java.util.Date;
-import java.util.List;
+import java.util.List; // Mungkin tidak dibutuhkan di sini
 import java.awt.image.BufferedImage;
 import java.net.URL;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
+import java.time.LocalDate; // Mungkin tidak dibutuhkan di sini
+import java.time.ZoneId; // Mungkin tidak dibutuhkan di sini
+import java.time.format.DateTimeFormatter; // Mungkin tidak dibutuhkan di sini
+import java.time.temporal.ChronoUnit; // Mungkin tidak dibutuhkan di sini
 import java.util.HashMap;
 import java.util.Map;
-import java.awt.Dimension;
 import java.sql.SQLException;
+import javax.imageio.ImageIO; // Tambah import ini untuk ImageIO
+import java.text.SimpleDateFormat;
 
 // Pastikan import ini ADA dan BENAR
 import com.github.sarxos.webcam.Webcam;
@@ -27,21 +31,22 @@ import com.google.zxing.client.j2se.BufferedImageLuminanceSource;
 import com.google.zxing.common.HybridBinarizer;
 
 public class InputProductForm extends JFrame {
-    private JTextField tfBarcode, tfNama, tfHarga, tfKategori;
+    // --- PENAMBAHAN DEKLARASI tfStok ---
+    private JTextField tfBarcode, tfNama, tfHarga, tfKategori, tfStok;
     private JSpinner spinnerProduksi, spinnerExpired;
     private ProductDAO productDAO;
     private JLabel photoLabel;
     private File selectedPhoto;
 
-    // Webcam-related fields
     private Webcam webcam = null;
     private WebcamPanel webcamPanel = null;
     private Thread barcodeScannerThread = null;
     private JButton startWebcamBtn, stopWebcamBtn, captureBtn;
     private JPanel webcamControlPanel;
-    private JPanel mainPanel; // Declare mainPanel at class level to make it accessible
+    private JPanel contentPanel;
+    private boolean isEditMode = false;
+    private String originalCode = null;
 
-    // --- Data Produk yang Telah Ditentukan Sebelumnya ---
     private static class PredefinedProductInfo {
         String name;
         double price;
@@ -58,29 +63,27 @@ public class InputProductForm extends JFrame {
 
     private static final Map<String, PredefinedProductInfo> predefinedProducts = new HashMap<>();
     static {
-        // Contoh produk predefinisi
-        predefinedProducts.put("8998800100018", new PredefinedProductInfo("Facial Wash Brightening", 35000.0, "Pembersih Wajah", "assets/photo/facial_wash_brightening.jpg"));
-        predefinedProducts.put("8998800100025", new PredefinedProductInfo("Daily Moisturizer Hydrating", 50000.0, "Pelembab", "assets/photo/daily_moisturizer_hydrating.jpg"));
-        predefinedProducts.put("8998800100032", new PredefinedProductInfo("Sunscreen SPF 50 PA+++", 45000.0, "Perlindungan Matahari", "assets/photo/sunscreen_spf_50.jpg"));
-        predefinedProducts.put("8998800100049", new PredefinedProductInfo("Acne Spot Treatment", 40000.0, "Perawatan Jerawat", "assets/photo/acne_spot_treatment.jpg"));
-        predefinedProducts.put("8998800100056", new PredefinedProductInfo("Brightening Serum Vit C", 60000.0, "Serum", "assets/photo/brightening_serum_vit_c.jpg"));
+        predefinedProducts.put("8998800100018", new PredefinedProductInfo("Facial Wash Brightening", 35000.0, "Pembersih Wajah", "assets/facialwash_qeemla_skin.jpg"));
+        predefinedProducts.put("8998800100025", new PredefinedProductInfo("Serum Qeemla Skin", 50000.0, "Pelembab", "assets/booster serum qeemla skin.png"));
+        predefinedProducts.put("8998800100032", new PredefinedProductInfo("Sunscreen SPF 50 PA+++", 45000.0, "Perlindungan Matahari", "assets/day cream qeemla skin.png"));
+        predefinedProducts.put("8998800100049", new PredefinedProductInfo("Toner", 40000.0, "Perawatan Jerawat", "assets/toner qeemla skin.png"));
     }
 
-    // Ubah konstruktor untuk menerima ProductDAO
+
     public InputProductForm(ProductDAO productDAO) {
-        this.productDAO = productDAO; // Assign the ProductDAO
+        this.productDAO = productDAO;
         setTitle("➕ Input Produk Baru");
-        setSize(800, 700);
+        setSize(800, 750); // Ukuran disesuaikan untuk field baru
+        setMinimumSize(new Dimension(800, 750)); // Ukuran disesuaikan
         setLocationRelativeTo(null);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
-        // Custom JPanel sebagai background dengan gambar
-        CustomPanel background = new CustomPanel("assets/logo_qeemla.png");
+        CustomPanel background = new CustomPanel("assets/logo_qeemla.png"); // Path gambar background
         setContentPane(background);
         background.setLayout(new BorderLayout());
 
-        mainPanel = new JPanel(new GridBagLayout()); // Initialize mainPanel here
-        mainPanel.setOpaque(false); // Agar background terlihat
+        contentPanel = new JPanel(new GridBagLayout()); // Menggunakan contentPanel
+        contentPanel.setOpaque(false);
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(8, 8, 8, 8);
@@ -93,117 +96,116 @@ public class InputProductForm extends JFrame {
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.gridwidth = 3;
-        mainPanel.add(titleLabel, gbc);
+        contentPanel.add(titleLabel, gbc);
 
         gbc.gridwidth = 1;
 
         // Form Input
-        gbc.gridx = 0; gbc.gridy = 1; mainPanel.add(new JLabel("Barcode:"), gbc);
+        gbc.gridx = 0; gbc.gridy = 1; contentPanel.add(new JLabel("Barcode:"), gbc);
         tfBarcode = new JTextField(20);
-        gbc.gridx = 1; mainPanel.add(tfBarcode, gbc);
+        gbc.gridx = 1; contentPanel.add(tfBarcode, gbc);
         JButton scanBarcodeBtn = new JButton("Scan Barcode");
-        scanBarcodeBtn.setBackground(new Color(6, 94, 84));
-        scanBarcodeBtn.setForeground(Color.WHITE);
-        scanBarcodeBtn.setFocusPainted(false);
-        gbc.gridx = 2; mainPanel.add(scanBarcodeBtn, gbc);
+        styleButton(scanBarcodeBtn, new Color(6, 94, 84), Color.WHITE);
+        gbc.gridx = 2; contentPanel.add(scanBarcodeBtn, gbc);
 
-        gbc.gridx = 0; gbc.gridy = 2; mainPanel.add(new JLabel("Nama Produk:"), gbc);
+        gbc.gridx = 0; gbc.gridy = 2; contentPanel.add(new JLabel("Nama Produk:"), gbc);
         tfNama = new JTextField(20);
-        gbc.gridx = 1; gbc.gridwidth = 2; mainPanel.add(tfNama, gbc);
-        gbc.gridwidth = 1; // Reset gridwidth
+        gbc.gridx = 1; gbc.gridwidth = 2; contentPanel.add(tfNama, gbc);
+        gbc.gridwidth = 1;
 
-        gbc.gridx = 0; gbc.gridy = 3; mainPanel.add(new JLabel("Harga:"), gbc);
+        gbc.gridx = 0; gbc.gridy = 3; contentPanel.add(new JLabel("Harga:"), gbc);
         tfHarga = new JTextField(20);
-        gbc.gridx = 1; gbc.gridwidth = 2; mainPanel.add(tfHarga, gbc);
+        gbc.gridx = 1; gbc.gridwidth = 2; contentPanel.add(tfHarga, gbc);
         gbc.gridwidth = 1;
 
-        gbc.gridx = 0; gbc.gridy = 4; mainPanel.add(new JLabel("Kategori:"), gbc);
+        gbc.gridx = 0; gbc.gridy = 4; contentPanel.add(new JLabel("Kategori:"), gbc);
         tfKategori = new JTextField(20);
-        gbc.gridx = 1; gbc.gridwidth = 2; mainPanel.add(tfKategori, gbc);
+        gbc.gridx = 1; gbc.gridwidth = 2; contentPanel.add(tfKategori, gbc);
+        gbc.gridwidth = 1;
+        
+        // --- PENAMBAHAN FIELD STOK ---
+        gbc.gridx = 0; gbc.gridy = 5; contentPanel.add(new JLabel("Stok:"), gbc);
+        tfStok = new JTextField(20);
+        gbc.gridx = 1; gbc.gridwidth = 2; contentPanel.add(tfStok, gbc);
         gbc.gridwidth = 1;
 
-        gbc.gridx = 0; gbc.gridy = 5; mainPanel.add(new JLabel("Tanggal Produksi:"), gbc);
+        // --- Posisi gbc.gridy disesuaikan (digeser ke bawah) ---
+        gbc.gridx = 0; gbc.gridy = 6; contentPanel.add(new JLabel("Tanggal Produksi:"), gbc);
         SpinnerDateModel dateModelProduksi = new SpinnerDateModel();
         spinnerProduksi = new JSpinner(dateModelProduksi);
         JSpinner.DateEditor dateEditorProduksi = new JSpinner.DateEditor(spinnerProduksi, "yyyy-MM-dd");
         spinnerProduksi.setEditor(dateEditorProduksi);
-        gbc.gridx = 1; gbc.gridwidth = 2; mainPanel.add(spinnerProduksi, gbc);
+        gbc.gridx = 1; gbc.gridwidth = 2; contentPanel.add(spinnerProduksi, gbc);
         gbc.gridwidth = 1;
 
-        gbc.gridx = 0; gbc.gridy = 6; mainPanel.add(new JLabel("Tanggal Expired:"), gbc);
+        gbc.gridx = 0; gbc.gridy = 7; contentPanel.add(new JLabel("Tanggal Expired:"), gbc);
         SpinnerDateModel dateModelExpired = new SpinnerDateModel();
         spinnerExpired = new JSpinner(dateModelExpired);
         JSpinner.DateEditor dateEditorExpired = new JSpinner.DateEditor(spinnerExpired, "yyyy-MM-dd");
         spinnerExpired.setEditor(dateEditorExpired);
-        gbc.gridx = 1; gbc.gridwidth = 2; mainPanel.add(spinnerExpired, gbc);
+        gbc.gridx = 1; gbc.gridwidth = 2; contentPanel.add(spinnerExpired, gbc);
         gbc.gridwidth = 1;
 
-        // Photo Input
-        gbc.gridx = 0; gbc.gridy = 7; mainPanel.add(new JLabel("Foto Produk:"), gbc);
+        gbc.gridx = 0; gbc.gridy = 8; contentPanel.add(new JLabel("Foto Produk:"), gbc);
         photoLabel = new JLabel();
         photoLabel.setPreferredSize(new Dimension(100, 100));
         photoLabel.setBorder(BorderFactory.createLineBorder(Color.GRAY));
         photoLabel.setHorizontalAlignment(SwingConstants.CENTER);
         photoLabel.setVerticalAlignment(SwingConstants.CENTER);
         photoLabel.setText("Tidak ada foto");
-        gbc.gridx = 1; mainPanel.add(photoLabel, gbc);
+        gbc.gridx = 1; contentPanel.add(photoLabel, gbc);
 
         JButton choosePhotoBtn = new JButton("Pilih Foto");
-        choosePhotoBtn.setBackground(new Color(6, 94, 84));
-        choosePhotoBtn.setForeground(Color.WHITE);
-        choosePhotoBtn.setFocusPainted(false);
-        gbc.gridx = 2; mainPanel.add(choosePhotoBtn, gbc);
+        styleButton(choosePhotoBtn, new Color(6, 94, 84), Color.WHITE);
+        gbc.gridx = 2; contentPanel.add(choosePhotoBtn, gbc);
 
-        // Webcam Controls
         webcamControlPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 5));
         webcamControlPanel.setOpaque(false);
         startWebcamBtn = new JButton("Mulai Webcam");
         stopWebcamBtn = new JButton("Berhenti Webcam");
         captureBtn = new JButton("Ambil Gambar");
 
-        // Styling buttons
-        startWebcamBtn.setBackground(new Color(46, 139, 87)); // SeaGreen
-        startWebcamBtn.setForeground(Color.WHITE);
-        startWebcamBtn.setFocusPainted(false);
-        stopWebcamBtn.setBackground(new Color(178, 34, 34)); // FireBrick
-        stopWebcamBtn.setForeground(Color.WHITE);
-        stopWebcamBtn.setFocusPainted(false);
-        captureBtn.setBackground(new Color(65, 105, 225)); // RoyalBlue
-        captureBtn.setForeground(Color.WHITE);
-        captureBtn.setFocusPainted(false);
+        styleButton(startWebcamBtn, new Color(46, 139, 87), Color.WHITE);
+        styleButton(stopWebcamBtn, new Color(178, 34, 34), Color.WHITE);
+        styleButton(captureBtn, new Color(65, 105, 225), Color.WHITE);
 
         webcamControlPanel.add(startWebcamBtn);
         webcamControlPanel.add(stopWebcamBtn);
         webcamControlPanel.add(captureBtn);
 
         gbc.gridx = 0;
-        gbc.gridy = 8;
+        gbc.gridy = 9;
         gbc.gridwidth = 3;
-        mainPanel.add(webcamControlPanel, gbc); // Add webcamControlPanel to mainPanel
+        contentPanel.add(webcamControlPanel, gbc);
 
-        // Button panel
+        webcam = Webcam.getDefault();
+        if (webcam != null) {
+            webcam.setViewSize(WebcamResolution.QVGA.getSize());
+            webcamPanel = new WebcamPanel(webcam);
+            gbc.gridx = 0;
+            gbc.gridy = 10; // Posisi disesuaikan
+            gbc.gridwidth = 3;
+            gbc.fill = GridBagConstraints.BOTH;
+            gbc.weightx = 1.0;
+            gbc.weighty = 1.0;
+            contentPanel.add(webcamPanel, gbc);
+        }
+
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
         buttonPanel.setOpaque(false);
         JButton simpanBtn = new JButton("Simpan Produk");
         JButton batalBtn = new JButton("Batal");
 
-        simpanBtn.setBackground(new Color(6, 94, 84));
-        simpanBtn.setForeground(Color.WHITE);
-        simpanBtn.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        simpanBtn.setFocusPainted(false);
-        batalBtn.setBackground(new Color(220, 20, 60)); // Crimson
-        batalBtn.setForeground(Color.WHITE);
-        batalBtn.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        batalBtn.setFocusPainted(false);
+        styleButton(simpanBtn, new Color(6, 94, 84), Color.WHITE);
+        styleButton(batalBtn, new Color(220, 20, 60), Color.WHITE);
 
         buttonPanel.add(simpanBtn);
         buttonPanel.add(batalBtn);
 
-        // Add mainPanel to a JScrollPane for scrollability if content exceeds frame size
-        JScrollPane scrollPane = new JScrollPane(mainPanel);
+        JScrollPane scrollPane = new JScrollPane(contentPanel);
         scrollPane.setOpaque(false);
         scrollPane.getViewport().setOpaque(false);
-        scrollPane.setBorder(BorderFactory.createEmptyBorder()); // Hilangkan border scroll pane
+        scrollPane.setBorder(BorderFactory.createEmptyBorder());
 
         background.add(scrollPane, BorderLayout.CENTER);
         background.add(buttonPanel, BorderLayout.SOUTH);
@@ -218,7 +220,6 @@ public class InputProductForm extends JFrame {
         stopWebcamBtn.addActionListener(e -> stopWebcam());
         captureBtn.addActionListener(e -> capturePhotoFromWebcam());
 
-        // Add WindowListener to stop webcam when form is closed
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
@@ -236,8 +237,26 @@ public class InputProductForm extends JFrame {
         });
     }
 
+    public InputProductForm(ProductDAO productDAO, Product productToEdit) {
+        this(productDAO);
+        setTitle("Edit Produk");
+        tfBarcode.setText(productToEdit.getCode());
+        tfBarcode.setEditable(false);
+        isEditMode = true;
+        originalCode = productToEdit.getCode();
+        loadProductData(productToEdit);
+    }
+
+    private void styleButton(JButton button, Color bgColor, Color fgColor) {
+        button.setBackground(bgColor);
+        button.setForeground(fgColor);
+        button.setFocusPainted(false);
+        button.setBorder(BorderFactory.createEmptyBorder(8, 15, 8, 15));
+        button.setFont(new Font("Segoe UI", Font.BOLD, 12));
+    }
+
     private void startBarcodeScanner() {
-        if (webcam == null || !webcam.isOpen()) { // Check if webcam is not open
+        if (webcam == null || !webcam.isOpen()) {
             JOptionPane.showMessageDialog(this, "Webcam belum dimulai. Harap mulai webcam terlebih dahulu.", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
@@ -251,10 +270,10 @@ public class InputProductForm extends JFrame {
             boolean barcodeFound = false;
             while (!barcodeFound && !Thread.currentThread().isInterrupted()) {
                 try {
-                    Thread.sleep(100); // Tunggu sebentar
+                    Thread.sleep(100);
                 } catch (InterruptedException ex) {
-                    Thread.currentThread().interrupt(); // Restore the interrupted status
-                    break; // Keluar dari loop jika thread diinterupsi
+                    Thread.currentThread().interrupt();
+                    break;
                 }
 
                 Result result = null;
@@ -270,7 +289,7 @@ public class InputProductForm extends JFrame {
                     try {
                         result = new MultiFormatReader().decode(bitmap);
                     } catch (NotFoundException e) {
-                        // Tidak ada barcode ditemukan, lanjutkan
+                        // No barcode found
                     }
                 }
 
@@ -279,15 +298,13 @@ public class InputProductForm extends JFrame {
                     SwingUtilities.invokeLater(() -> {
                         tfBarcode.setText(barcode);
                         fillProductInfo(barcode);
-                        // Optional: stop webcam after successful scan
-                        // stopWebcam(); // Uncomment if you want to stop webcam automatically
                     });
-                    barcodeFound = true; // Set flag to exit loop
+                    barcodeFound = true;
                 }
             }
             if (barcodeFound) {
                 JOptionPane.showMessageDialog(InputProductForm.this, "Barcode berhasil dipindai: " + tfBarcode.getText(), "Scan Berhasil", JOptionPane.INFORMATION_MESSAGE);
-            } else {
+            } else if (!Thread.currentThread().isInterrupted()) {
                 JOptionPane.showMessageDialog(InputProductForm.this, "Scanning barcode dihentikan.", "Info", JOptionPane.INFORMATION_MESSAGE);
             }
         });
@@ -295,14 +312,12 @@ public class InputProductForm extends JFrame {
         JOptionPane.showMessageDialog(this, "Mulai scanning barcode...", "Info", JOptionPane.INFORMATION_MESSAGE);
     }
 
-
     private void fillProductInfo(String barcode) {
         PredefinedProductInfo info = predefinedProducts.get(barcode);
         if (info != null) {
             tfNama.setText(info.name);
             tfHarga.setText(String.valueOf(info.price));
             tfKategori.setText(info.category);
-            // Load photo if available
             if (info.imagePath != null && !info.imagePath.isEmpty()) {
                 File photoFile = new File(info.imagePath);
                 if (photoFile.exists()) {
@@ -328,79 +343,34 @@ public class InputProductForm extends JFrame {
     }
 
     private void startWebcam() {
-        if (webcam == null) {
-            webcam = Webcam.getDefault();
-            if (webcam != null) {
-                webcam.setViewSize(WebcamResolution.VGA.getSize()); // Mengatur ukuran tampilan
-                webcamPanel = new WebcamPanel(webcam);
-                webcamPanel.setFPSDisplayed(true);
-                webcamPanel.setDisplayDebugInfo(false);
-                webcamPanel.setImageSizeDisplayed(false);
-                webcamPanel.setMirrored(true); // Membalik gambar agar seperti cermin
-
-                // Remove existing webcam control panel from mainPanel
-                mainPanel.remove(webcamControlPanel);
-                
-                // Add webcamPanel to the appropriate position in mainPanel
-                GridBagConstraints gbc = new GridBagConstraints();
-                gbc.gridx = 0;
-                gbc.gridy = 9; // Letakkan di bawah kontrol webcam lama
-                gbc.gridwidth = 3;
-                gbc.fill = GridBagConstraints.BOTH;
-                gbc.weightx = 1.0;
-                gbc.weighty = 1.0;
-                gbc.insets = new Insets(8, 8, 8, 8);
-                
-                mainPanel.add(webcamPanel, gbc); // Corrected: Add webcamPanel directly to mainPanel
-
-                // Re-add the webcamControlPanel below the webcamPanel
-                gbc.gridx = 0;
-                gbc.gridy = 10; // Geser ke bawah, di bawah webcamPanel
-                gbc.gridwidth = 3;
-                gbc.weightx = 0;
-                gbc.weighty = 0;
-                mainPanel.add(webcamControlPanel, gbc);
-
-                // Revalidate and repaint mainPanel to update UI
-                mainPanel.revalidate();
-                mainPanel.repaint();
-
-                // Start webcam in a separate thread to avoid freezing the UI
-                new Thread(() -> {
-                    webcam.open();
-                }).start();
-            } else {
-                JOptionPane.showMessageDialog(this, "Tidak ada webcam ditemukan.", "Error", JOptionPane.ERROR_MESSAGE);
-            }
+       if (webcam != null && !webcam.isOpen()) {
+            new Thread(() -> {
+                webcam.open();
+                SwingUtilities.invokeLater(() -> {
+                    if (webcamPanel != null) webcamPanel.start();
+                    JOptionPane.showMessageDialog(this, "Webcam berhasil dimulai.", "Info", JOptionPane.INFORMATION_MESSAGE);
+                });
+            }).start();
+        } else if (webcam == null) {
+            JOptionPane.showMessageDialog(this, "Tidak ada webcam ditemukan.", "Error", JOptionPane.ERROR_MESSAGE);
         } else {
             JOptionPane.showMessageDialog(this, "Webcam sudah berjalan.", "Info", JOptionPane.INFORMATION_MESSAGE);
         }
     }
 
-
     private void stopWebcam() {
+        if (barcodeScannerThread != null && barcodeScannerThread.isAlive()) {
+            barcodeScannerThread.interrupt();
+            barcodeScannerThread = null;
+        }
         if (webcam != null && webcam.isOpen()) {
-            if (barcodeScannerThread != null && barcodeScannerThread.isAlive()) {
-                barcodeScannerThread.interrupt(); // Menghentikan thread scanner barcode
-                barcodeScannerThread = null;
-            }
-            webcam.close();
-            // Remove webcamPanel from its parent (mainPanel)
-            if (webcamPanel != null) {
-                mainPanel.remove(webcamPanel); // Corrected: Remove webcamPanel directly from mainPanel
-                webcamPanel = null;
-            }
-
-            // Restore webcamControlPanel's visibility and position if needed
-            // (You might want to just hide webcamPanel and leave controls in place)
-            // For now, let's just revalidate and repaint the main panel to reflect changes
-            
-            // Revalidate and repaint mainPanel to update UI
-            mainPanel.revalidate();
-            mainPanel.repaint();
-            JOptionPane.showMessageDialog(this, "Webcam berhasil dihentikan.", "Info", JOptionPane.INFORMATION_MESSAGE);
-        } else {
-            JOptionPane.showMessageDialog(this, "Webcam tidak aktif.", "Info", JOptionPane.INFORMATION_MESSAGE);
+            new Thread(() -> {
+                if (webcamPanel != null) webcamPanel.stop();
+                webcam.close();
+                SwingUtilities.invokeLater(() -> {
+                     JOptionPane.showMessageDialog(this, "Webcam berhasil dihentikan.", "Info", JOptionPane.INFORMATION_MESSAGE);
+                });
+            }).start();
         }
     }
 
@@ -409,18 +379,13 @@ public class InputProductForm extends JFrame {
             try {
                 BufferedImage image = webcam.getImage();
                 if (image != null) {
-                    // Buat folder 'uploads' jika belum ada
                     File uploadsDir = new File("uploads");
                     if (!uploadsDir.exists()) {
                         uploadsDir.mkdirs();
                     }
-
-                    // Tentukan nama file yang unik (misalnya, berdasarkan timestamp)
                     String fileName = "product_" + System.currentTimeMillis() + ".png";
                     selectedPhoto = new File(uploadsDir, fileName);
-
-                    // Simpan gambar
-                    javax.imageio.ImageIO.write(image, "PNG", selectedPhoto);
+                    ImageIO.write(image, "PNG", selectedPhoto);
                     displayPhoto(selectedPhoto);
                     JOptionPane.showMessageDialog(this, "Foto berhasil diambil!", "Sukses", JOptionPane.INFORMATION_MESSAGE);
                 } else {
@@ -451,7 +416,7 @@ public class InputProductForm extends JFrame {
                 ImageIcon originalIcon = new ImageIcon(photoFile.getAbsolutePath());
                 Image img = originalIcon.getImage().getScaledInstance(100, 100, Image.SCALE_SMOOTH);
                 photoLabel.setIcon(new ImageIcon(img));
-                photoLabel.setText(""); // Hapus teks "Tidak ada foto"
+                photoLabel.setText("");
             } catch (Exception e) {
                 photoLabel.setIcon(null);
                 photoLabel.setText("Gagal memuat foto");
@@ -468,41 +433,43 @@ public class InputProductForm extends JFrame {
         String nama = tfNama.getText();
         String hargaStr = tfHarga.getText();
         String kategori = tfKategori.getText();
+        // --- MENGAMBIL DATA STOK ---
+        String stokStr = tfStok.getText();
         Date productionDate = (Date) spinnerProduksi.getValue();
         Date expiryDate = (Date) spinnerExpired.getValue();
         String photoPath = (selectedPhoto != null) ? selectedPhoto.getAbsolutePath() : null;
 
-        // Validasi input
-        if (code.isEmpty() || nama.isEmpty() || hargaStr.isEmpty() || kategori.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Semua field harus diisi!", "Error", JOptionPane.ERROR_MESSAGE);
+        // --- VALIDASI INPUT (termasuk stok) ---
+        if (code.isEmpty() || nama.isEmpty() || hargaStr.isEmpty() || kategori.isEmpty() || stokStr.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Semua field (termasuk Stok) harus diisi!", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
         double harga;
+        int stok;
         try {
             harga = Double.parseDouble(hargaStr);
+            // --- PARSING STOK KE INTEGER ---
+            stok = Integer.parseInt(stokStr);
         } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(this, "Harga harus berupa angka!", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Harga dan Stok harus berupa angka!", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
-        // Buat objek Product
-        Product newProduct = new Product(code, nama, harga, kategori, productionDate, expiryDate, photoPath);
-
         try {
-            productDAO.addProduct(newProduct); // Simpan produk ke database
-            JOptionPane.showMessageDialog(this, "Produk berhasil disimpan ke database!", "Sukses", JOptionPane.INFORMATION_MESSAGE);
+            // --- MENGGUNAKAN VARIABEL 'stok' SAAT MEMBUAT OBJEK ---
+            Product newProduct = new Product(code, nama, kategori, harga, stok, productionDate, expiryDate, photoPath);
 
-            // Kosongkan form setelah simpan
-            tfBarcode.setText("");
-            tfNama.setText("");
-            tfHarga.setText("");
-            tfKategori.setText("");
-            spinnerProduksi.setValue(new Date()); // Reset ke tanggal hari ini
-            spinnerExpired.setValue(new Date()); // Reset ke tanggal hari ini
-            photoLabel.setIcon(null);
-            photoLabel.setText("Tidak ada foto");
-            selectedPhoto = null;
+            if (isEditMode) {
+                productDAO.updateProduct(newProduct);
+                JOptionPane.showMessageDialog(this, "Produk berhasil diperbarui!", "Sukses", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                productDAO.addProduct(newProduct);
+                JOptionPane.showMessageDialog(this, "Produk berhasil disimpan ke database!", "Sukses", JOptionPane.INFORMATION_MESSAGE);
+            }
+            
+            clearForm();
+            // Optional: dispose(); // Jika ingin form langsung tertutup setelah simpan
 
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(this, "Error saat menyimpan produk: " + ex.getMessage(), "Database Error", JOptionPane.ERROR_MESSAGE);
@@ -510,8 +477,42 @@ public class InputProductForm extends JFrame {
         }
     }
 
-    // Custom JPanel untuk background
-    class CustomPanel extends JPanel {
+    private void clearForm() {
+        tfBarcode.setText("");
+        tfNama.setText("");
+        tfHarga.setText("");
+        tfKategori.setText("");
+        // --- MEMBERSIHKAN FIELD STOK ---
+        tfStok.setText("");
+        spinnerProduksi.setValue(new Date());
+        spinnerExpired.setValue(new Date());
+        photoLabel.setIcon(null);
+        photoLabel.setText("Tidak ada foto");
+        selectedPhoto = null;
+        tfBarcode.setEditable(true);
+        isEditMode = false;
+        originalCode = null;
+    }
+
+    private void loadProductData(Product p) {
+        tfBarcode.setText(p.getCode());
+        tfNama.setText(p.getName());
+        tfKategori.setText(p.getCategory());
+        tfHarga.setText(String.valueOf(p.getPrice()));
+        // --- MEMUAT DATA STOK KE FORM ---
+        tfStok.setText(String.valueOf(p.getStock()));
+        spinnerProduksi.setValue(p.getProductionDate());
+        spinnerExpired.setValue(p.getExpiryDate());
+        
+        originalCode = p.getCode();
+
+        if (p.getPhotoPath() != null) {
+            selectedPhoto = new File(p.getPhotoPath());
+            displayPhoto(selectedPhoto);
+        }
+    }
+
+    public class CustomPanel extends JPanel {
         private Image backgroundImage;
 
         public CustomPanel(String imagePath) {
@@ -521,9 +522,8 @@ public class InputProductForm extends JFrame {
                     backgroundImage = new ImageIcon(imageUrl).getImage();
                 } else {
                     System.err.println("Background image not found (classpath): " + imagePath);
-                    // Try direct path as a fallback if not in resources
                     File directFile = new File(imagePath);
-                    if (directFile.exists()){
+                    if (directFile.exists()) {
                         backgroundImage = new ImageIcon(directFile.getAbsolutePath()).getImage();
                     } else {
                         System.err.println("Background image not found (direct path): " + imagePath);
@@ -536,6 +536,7 @@ public class InputProductForm extends JFrame {
                 backgroundImage = null;
             }
         }
+
         @Override
         protected void paintComponent(Graphics g) {
             super.paintComponent(g);
