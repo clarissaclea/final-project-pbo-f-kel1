@@ -1,78 +1,79 @@
-import javax.swing.*;
+// File: ExpiryChecker.java
+
+import javax.swing.JOptionPane; // Diperlukan untuk menampilkan pesan jika digunakan langsung
+import java.sql.SQLException;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Date;
+import java.util.concurrent.TimeUnit; // <--- TAMBAHKAN IMPORT INI
 
-public class ExpiryChecker extends JFrame {
-    public ExpiryChecker(List<Product> productList) {
-        setTitle("Cek Kedaluwarsa Produk");
-        setSize(550, 350);
-        setLocationRelativeTo(null);
+public class ExpiryChecker {
 
-        JTextArea area = new JTextArea();
-        area.setEditable(false);
+    private ProductDAO productDAO;
 
-        StringBuilder tampil = new StringBuilder();
-        tampil.append("Daftar Produk:\n\n");
+    public ExpiryChecker(ProductDAO productDAO) {
+        this.productDAO = productDAO;
+    }
 
-        LocalDate hariIni = LocalDate.now();
+    public String generateReminder() {
+        StringBuilder output = new StringBuilder();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate today = LocalDate.now();
+
+        boolean adaReminder = false;
+
+        List<Product> productList;
+        try {
+            productList = productDAO.getAllProducts();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return "Error saat memuat data produk untuk pengingat: " + e.getMessage();
+        }
+
+        if (productList.isEmpty()) {
+            return "Tidak ada produk dalam daftar.";
+        }
+
+        output.append("--- Pengingat Produk Kedaluwarsa ---\n\n");
 
         for (Product p : productList) {
-            LocalDate expDate = p.getExpiryDate().toInstant()
-                      .atZone(java.time.ZoneId.systemDefault())
-                      .toLocalDate();
-
-            long selisihHari = java.time.temporal.ChronoUnit.DAYS.between(hariIni, expDate);
-
-            tampil.append("- ").append(p.getName())
-                  .append(" (Exp: ").append(expDate.format(formatter)).append(")\n");
-
-
-            if (selisihHari >= 0 && selisihHari <= 7) {
-                tampil.append("  ⚠ *BUANG segera* - kedaluwarsa dalam ")
-                      .append(selisihHari).append(" hari.\n");
-            } else if (selisihHari > 7 && selisihHari <= 30) {
-                tampil.append("  🔔 *PROMOkan* - segera jual, expired dalam ")
-                      .append(selisihHari).append(" hari.\n");
+            java.util.Date expiryDate = p.getExpiryDate();
+            if (expiryDate == null) {
+                continue;
             }
 
-            tampil.append("\n");
-        }
+            // Konversi java.util.Date ke LocalDate
+            LocalDate expDate = expiryDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
 
-        area.setText(tampil.toString());
-        add(new JScrollPane(area));
-        setVisible(true);
-    }
-    public static String generateReminder(List<Product> productList) {
-    StringBuilder output = new StringBuilder();
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-    LocalDate today = LocalDate.now();
+            long daysLeft = ChronoUnit.DAYS.between(today, expDate);
 
-    boolean adaReminder = false;
-
-    for (Product p : productList) {
-        LocalDate expDate = p.getExpiryDate().toInstant()
-                              .atZone(java.time.ZoneId.systemDefault())
-                              .toLocalDate();
-        long daysLeft = java.time.temporal.ChronoUnit.DAYS.between(today, expDate);
-
-        if (daysLeft <= 30 && daysLeft >= 0) {
-            adaReminder = true;
-            output.append("- ").append(p.getName())
-                  .append(" (Exp: ").append(expDate.format(formatter)).append(")\n");
-
-
-            if (daysLeft <= 7) {
-                output.append("  ⚠ *BUANG segera* - kedaluwarsa dalam ").append(daysLeft).append(" hari.\n\n");
-            } else {
-                output.append("  🔔 *PROMOSIKAN* - expired dalam ").append(daysLeft).append(" hari.\n\n");
+            if (daysLeft < 0) {
+                output.append("❌ ").append(p.getName())
+                      .append(" (Kode: ").append(p.getCode())
+                      .append(") -> Sudah KEDALUWARSA pada ").append(expDate.format(formatter))
+                      .append(" (").append(Math.abs(daysLeft)).append(" hari lalu)\n");
+                adaReminder = true;
+            } else if (daysLeft <= 7) {
+                output.append("⚠ ").append(p.getName())
+                      .append(" (Kode: ").append(p.getCode())
+                      .append(") -> SEGERA BUANG, kedaluwarsa dalam ")
+                      .append(daysLeft).append(" hari (").append(expDate.format(formatter)).append(")\n");
+                adaReminder = true;
+            } else if (daysLeft <= 30) {
+                output.append("🔔 ").append(p.getName())
+                      .append(" (Kode: ").append(p.getCode())
+                      .append(") -> PROMOkan, kedaluwarsa dalam ")
+                      .append(daysLeft).append(" hari (").append(expDate.format(formatter)).append(")\n");
+                adaReminder = true;
             }
         }
+
+        if (!adaReminder) {
+            return "Tidak ada produk yang memerlukan perhatian khusus saat ini.";
+        }
+        return output.toString();
     }
-
-    return adaReminder ? output.toString() : "Tidak ada produk yang mendekati expired.";
 }
-
-}
-
