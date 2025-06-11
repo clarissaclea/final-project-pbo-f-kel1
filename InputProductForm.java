@@ -5,21 +5,20 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
 import java.util.Date;
-import java.util.List; 
+import java.util.List; // Mungkin tidak dibutuhkan di sini
 import java.awt.image.BufferedImage;
 import java.net.URL;
-import java.time.LocalDate; 
-import java.time.ZoneId; 
-import java.time.format.DateTimeFormatter; 
-import java.time.temporal.ChronoUnit; 
+import java.time.LocalDate; // Mungkin tidak dibutuhkan di sini
+import java.time.ZoneId; // Mungkin tidak dibutuhkan di sini
+import java.time.format.DateTimeFormatter; // Mungkin tidak dibutuhkan di sini
+import java.time.temporal.ChronoUnit; // Mungkin tidak dibutuhkan di sini
 import java.util.HashMap;
 import java.util.Map;
 import java.sql.SQLException;
-import javax.imageio.ImageIO; //  import ini untuk ImageIO
+import javax.imageio.ImageIO; // Tambah import ini untuk ImageIO
 import java.text.SimpleDateFormat;
-import java.util.Calendar; 
 
-// import github
+// Pastikan import ini ADA dan BENAR
 import com.github.sarxos.webcam.Webcam;
 import com.github.sarxos.webcam.WebcamPanel;
 import com.github.sarxos.webcam.WebcamResolution;
@@ -313,60 +312,125 @@ public class InputProductForm extends JFrame {
         JOptionPane.showMessageDialog(this, "Mulai scanning barcode...", "Info", JOptionPane.INFORMATION_MESSAGE);
     }
 
-    // Ganti metode fillProductInfo Anda dengan yang ini
-private void fillProductInfo(String barcode) {
-    PredefinedProductInfo info = predefinedProducts.get(barcode);
-    if (info != null) {
-        // Mengisi field yang sudah ada
-        tfNama.setText(info.name);
-        tfHarga.setText(String.valueOf(info.price));
-        tfKategori.setText(info.category);
-
-        // --- LOGIKA PENGATURAN TANGGAL OTOMATIS ---      
+    private void fillProductInfo(String barcode) {
+        System.out.println("Mencari produk dengan barcode: " + barcode);
         
-        // Tanggal hari ini
-        Date today = new Date();
-        
-        // Atur tanggal produksi ke hari ini
-        spinnerProduksi.setValue(today);
-
-        // Hitung tanggal satu tahun dari sekarang untuk tanggal expired
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(today); // Mulai dari hari ini
-        cal.add(Calendar.YEAR, 1); // Tambahkan 1 tahun
-        Date expiryDate = cal.getTime(); // Dapatkan hasilnya sebagai objek Date
-
-        // Atur tanggal expired
-        spinnerExpired.setValue(expiryDate);
-
-        // Logika untuk menampilkan foto (tidak berubah)
-        if (info.imagePath != null && !info.imagePath.isEmpty()) {
-            File photoFile = new File(info.imagePath);
-            if (photoFile.exists()) {
-                selectedPhoto = photoFile;
-                displayPhoto(selectedPhoto);
+        PredefinedProductInfo info = predefinedProducts.get(barcode);
+        if (info != null) {
+            System.out.println("Produk ditemukan: " + info.name);
+            
+            // Isi data produk
+            tfNama.setText(info.name);
+            tfHarga.setText(String.valueOf(info.price));
+            tfKategori.setText(info.category);
+            
+            // Proses gambar
+            if (info.imagePath != null && !info.imagePath.isEmpty()) {
+                System.out.println("Mencoba memuat gambar dari: " + info.imagePath);
+                boolean imageLoaded = false;
+                
+                // Coba load dari classpath terlebih dahulu
+                try {
+                    URL imageUrl = getClass().getClassLoader().getResource(info.imagePath);
+                    if (imageUrl != null) {
+                        System.out.println("Gambar ditemukan di classpath");
+                        
+                        // Load gambar dari classpath
+                        ImageIcon originalIcon = new ImageIcon(imageUrl);
+                        Image img = originalIcon.getImage().getScaledInstance(100, 100, Image.SCALE_SMOOTH);
+                        photoLabel.setIcon(new ImageIcon(img));
+                        photoLabel.setText("");
+                        
+                        // Buat direktori uploads jika belum ada
+                        File uploadsDir = new File("uploads");
+                        if (!uploadsDir.exists()) {
+                            uploadsDir.mkdirs();
+                            System.out.println("Direktori uploads dibuat");
+                        }
+                        
+                        // Buat file copy untuk selectedPhoto
+                        String fileName = "predefined_" + barcode + ".jpg";
+                        selectedPhoto = new File(uploadsDir, fileName);
+                        
+                        // Convert ImageIcon ke BufferedImage dan simpan
+                        BufferedImage bufferedImage = new BufferedImage(
+                            originalIcon.getIconWidth(), 
+                            originalIcon.getIconHeight(), 
+                            BufferedImage.TYPE_INT_RGB
+                        );
+                        Graphics2D g2d = bufferedImage.createGraphics();
+                        g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+                        g2d.drawImage(originalIcon.getImage(), 0, 0, null);
+                        g2d.dispose();
+                        
+                        // Simpan gambar
+                        ImageIO.write(bufferedImage, "jpg", selectedPhoto);
+                        imageLoaded = true;
+                        
+                        System.out.println("Gambar berhasil disimpan ke: " + selectedPhoto.getAbsolutePath());
+                        
+                    } else {
+                        System.out.println("Gambar tidak ditemukan di classpath, mencoba path langsung");
+                    }
+                } catch (Exception e) {
+                    System.err.println("Error loading from classpath: " + e.getMessage());
+                }
+                
+                // Jika gagal dari classpath, coba dari path langsung
+                if (!imageLoaded) {
+                    try {
+                        File photoFile = new File(info.imagePath);
+                        System.out.println("Mengecek file di: " + photoFile.getAbsolutePath());
+                        System.out.println("File exists: " + photoFile.exists());
+                        
+                        if (photoFile.exists()) {
+                            selectedPhoto = photoFile;
+                            displayPhoto(selectedPhoto);
+                            imageLoaded = true;
+                            System.out.println("Gambar berhasil dimuat dari file langsung");
+                        }
+                    } catch (Exception e) {
+                        System.err.println("Error loading from direct path: " + e.getMessage());
+                    }
+                }
+                
+                // Jika semua cara gagal
+                if (!imageLoaded) {
+                    System.err.println("Gagal memuat gambar dari semua sumber");
+                    photoLabel.setIcon(null);
+                    photoLabel.setText("Foto tidak ditemukan");
+                    selectedPhoto = null;
+                    
+                    // Tampilkan dialog error
+                    JOptionPane.showMessageDialog(this, 
+                        "Foto produk tidak ditemukan di: " + info.imagePath + 
+                        "\nPastikan file gambar tersedia di lokasi yang benar.", 
+                        "Foto Tidak Ditemukan", 
+                        JOptionPane.WARNING_MESSAGE);
+                }
+                
             } else {
-                System.err.println("Predefined photo not found: " + info.imagePath);
                 photoLabel.setIcon(null);
-                photoLabel.setText("Foto tidak ditemukan");
+                photoLabel.setText("Tidak ada foto");
+                selectedPhoto = null;
+                System.out.println("Tidak ada path gambar untuk produk ini");
             }
+            
         } else {
+            // Reset semua field jika produk tidak ditemukan
+            System.out.println("Produk tidak ditemukan dalam data predefinisi");
+            tfNama.setText("");
+            tfHarga.setText("");
+            tfKategori.setText("");
             photoLabel.setIcon(null);
             photoLabel.setText("Tidak ada foto");
+            selectedPhoto = null;
+            JOptionPane.showMessageDialog(this, 
+                "Produk dengan barcode " + barcode + " tidak ditemukan di data predefinisi.", 
+                "Info", 
+                JOptionPane.INFORMATION_MESSAGE);
         }
-    } else {
-        // Jika barcode tidak ditemukan, kosongkan semua field
-        tfNama.setText("");
-        tfHarga.setText("");
-        tfKategori.setText("");
-        photoLabel.setIcon(null);
-        photoLabel.setText("Tidak ada foto");
-        // Kosongkan juga tanggal atau set ke default
-        spinnerProduksi.setValue(new Date());
-        spinnerExpired.setValue(new Date());
-        JOptionPane.showMessageDialog(this, "Produk dengan barcode " + barcode + " tidak ditemukan di data predefinisi.", "Info", JOptionPane.INFORMATION_MESSAGE);
     }
-}
 
     private void startWebcam() {
        if (webcam != null && !webcam.isOpen()) {
