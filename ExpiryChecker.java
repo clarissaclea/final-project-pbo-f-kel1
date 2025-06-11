@@ -1,6 +1,6 @@
 // File: ExpiryChecker.java
 
-import javax.swing.JOptionPane; // Diperlukan untuk menampilkan pesan jika digunakan langsung
+import javax.swing.JOptionPane;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -8,7 +8,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Date;
-import java.util.concurrent.TimeUnit; // <--- TAMBAHKAN IMPORT INI
+import java.util.concurrent.TimeUnit;
 
 public class ExpiryChecker {
 
