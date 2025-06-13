@@ -17,6 +17,8 @@ public class DaftarProductForm extends JFrame {
     private JTable table;
     private DefaultTableModel model;
     private ProductDAO productDAO;
+    private String emailLogin;
+
 
     public DaftarProductForm(ProductDAO productDAO) {
         this.productDAO = productDAO;
@@ -46,12 +48,14 @@ public class DaftarProductForm extends JFrame {
             public boolean isCellEditable(int row, int column) {
                 return false;
             }
+
             @Override
             public Class<?> getColumnClass(int column) {
                 if (column == 0) return ImageIcon.class;
                 return Object.class;
             }
         };
+
         table = new JTable(model) {
             @Override
             public Component prepareRenderer(TableCellRenderer renderer, int row, int column) {
@@ -99,6 +103,7 @@ public class DaftarProductForm extends JFrame {
                 return label;
             }
         });
+
         table.getColumnModel().getColumn(0).setPreferredWidth(90);
 
         JTableHeader header = table.getTableHeader();
@@ -109,7 +114,10 @@ public class DaftarProductForm extends JFrame {
         table.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         table.setRowHeight(80);
         table.setGridColor(new Color(180, 180, 180));
-        table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+
+        // ✅ Perubahan responsivitas:
+        table.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+        table.setPreferredScrollableViewportSize(null);
 
         JScrollPane scrollPane = new JScrollPane(table);
         scrollPane.setOpaque(false);
@@ -212,7 +220,7 @@ public class DaftarProductForm extends JFrame {
         try {
             Product productToEdit = productDAO.getProductByCode(productCode);
             if (productToEdit != null) {
-                InputProductForm inputForm = new InputProductForm(productDAO, productToEdit);
+                InputProductForm inputForm = new InputProductForm(productDAO, productToEdit, emailLogin);
                 inputForm.addWindowListener(new WindowAdapter() {
                     @Override
                     public void windowClosed(WindowEvent e) {
@@ -264,17 +272,14 @@ public class DaftarProductForm extends JFrame {
                 if (imageUrl != null) {
                     backgroundImage = new ImageIcon(imageUrl).getImage();
                 } else {
-                    System.err.println("Background image not found (classpath): " + imagePath);
                     File directFile = new File(imagePath);
-                    if (directFile.exists()){
+                    if (directFile.exists()) {
                         backgroundImage = new ImageIcon(directFile.getAbsolutePath()).getImage();
                     } else {
-                        System.err.println("Background image not found (direct path): " + imagePath);
                         backgroundImage = null;
                     }
                 }
             } catch (Exception e) {
-                System.err.println("Error loading background image: " + imagePath);
                 e.printStackTrace();
                 backgroundImage = null;
             }
