@@ -74,8 +74,8 @@ public class InputProductForm extends JFrame {
     public InputProductForm(ProductDAO productDAO) {
         this.productDAO = productDAO;
         setTitle("➕ Input Produk Baru");
-        setSize(1000, 900); // Ukuran window diperbesar untuk mengakomodasi webcam yang lebih besar
-        setMinimumSize(new Dimension(1000, 900)); 
+        setSize(800, 750); // Ukuran disesuaikan untuk field baru
+        setMinimumSize(new Dimension(800, 750)); // Ukuran disesuaikan
         setLocationRelativeTo(null);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
@@ -179,43 +179,17 @@ public class InputProductForm extends JFrame {
         gbc.gridwidth = 3;
         contentPanel.add(webcamControlPanel, gbc);
 
-        // INISIALISASI WEBCAM DENGAN UKURAN YANG LEBIH BESAR
         webcam = Webcam.getDefault();
         if (webcam != null) {
-            // Menggunakan resolusi VGA untuk kualitas yang lebih baik
-            webcam.setViewSize(WebcamResolution.VGA.getSize()); // 640x480, lebih besar dari QVGA
+            webcam.setViewSize(WebcamResolution.QVGA.getSize());
             webcamPanel = new WebcamPanel(webcam);
-            
-            // UKURAN WEBCAM PANEL DIPERBESAR UNTUK FULL WIDTH
-            webcamPanel.setPreferredSize(new Dimension(900, 400)); // Lebar hampir full, tinggi diperbesar
-            webcamPanel.setMinimumSize(new Dimension(900, 400));
-            webcamPanel.setMaximumSize(new Dimension(900, 400));
-            webcamPanel.setFPSDisplayed(true);
-            webcamPanel.setBackground(Color.BLACK);
-            
-            // Border untuk webcam panel agar terlihat lebih jelas
-            webcamPanel.setBorder(BorderFactory.createTitledBorder(
-                BorderFactory.createLineBorder(new Color(6, 94, 84), 2), 
-                "📷 Area Scan Barcode - Arahkan barcode ke kamera", 
-                0, 0, 
-                new Font("Segoe UI", Font.BOLD, 12), 
-                new Color(6, 94, 84)
-            ));
-
             gbc.gridx = 0;
             gbc.gridy = 10; // Posisi disesuaikan
             gbc.gridwidth = 3;
-            gbc.fill = GridBagConstraints.BOTH;
+            gbc.fill = GridBagConstraints.CENTER;
             gbc.weightx = 1.0;
-            gbc.weighty = 0.8; // Memberikan space yang cukup untuk webcam
-            gbc.insets = new Insets(10, 10, 10, 10); // Margin yang lebih besar
+            gbc.weighty = 1.0;
             contentPanel.add(webcamPanel, gbc);
-            
-            // Reset constraints untuk komponen selanjutnya
-            gbc.fill = GridBagConstraints.HORIZONTAL;
-            gbc.weightx = 0.0;
-            gbc.weighty = 0.0;
-            gbc.insets = new Insets(8, 8, 8, 8);
         }
 
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
@@ -233,8 +207,6 @@ public class InputProductForm extends JFrame {
         scrollPane.setOpaque(false);
         scrollPane.getViewport().setOpaque(false);
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
-        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 
         background.add(scrollPane, BorderLayout.CENTER);
         background.add(buttonPanel, BorderLayout.SOUTH);
@@ -402,7 +374,7 @@ private void fillProductInfo(String barcode) {
                 webcam.open();
                 SwingUtilities.invokeLater(() -> {
                     if (webcamPanel != null) webcamPanel.start();
-                    JOptionPane.showMessageDialog(this, "Webcam berhasil dimulai. Siap untuk scan barcode!", "Info", JOptionPane.INFORMATION_MESSAGE);
+                    JOptionPane.showMessageDialog(this, "Webcam berhasil dimulai.", "Info", JOptionPane.INFORMATION_MESSAGE);
                 });
             }).start();
         } else if (webcam == null) {
