@@ -185,7 +185,7 @@ public class InputProductForm extends JFrame {
             gbc.gridx = 0;
             gbc.gridy = 10; // Posisi disesuaikan
             gbc.gridwidth = 3;
-            gbc.fill = GridBagConstraints.BOTH;
+            gbc.fill = GridBagConstraints.CENTER;
             gbc.weightx = 1.0;
             gbc.weighty = 1.0;
             contentPanel.add(webcamPanel, gbc);
