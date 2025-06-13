@@ -1,6 +1,6 @@
 // File: ExpiryChecker.java
 
-import javax.swing.JOptionPane;
+import javax.swing.JOptionPane; //menampilkan langsung
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -37,7 +37,7 @@ public class ExpiryChecker {
             return "Tidak ada produk dalam daftar.";
         }
 
-        output.append("--- Pengingat Produk Kedaluwarsa ---\n\n");
+        output.append("--- Pengingat Produk Expired ---\n\n");
 
         for (Product p : productList) {
             java.util.Date expiryDate = p.getExpiryDate();
@@ -65,7 +65,7 @@ public class ExpiryChecker {
             } else if (daysLeft <= 30) {
                 output.append("🔔 ").append(p.getName())
                       .append(" (Kode: ").append(p.getCode())
-                      .append(") -> PROMOkan, kedaluwarsa dalam ")
+                      .append(") -> PROMOSIKAN, expired dalam ")
                       .append(daysLeft).append(" hari (").append(expDate.format(formatter)).append(")\n");
                 adaReminder = true;
             }
