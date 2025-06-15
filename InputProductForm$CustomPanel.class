@@ -1,0 +1,48 @@
+// Source code is decompiled from a .class file using FernFlower decompiler.
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Image;
+import java.io.File;
+import java.net.URL;
+import javax.swing.ImageIcon;
+import javax.swing.JPanel;
+
+public class InputProductForm$CustomPanel extends JPanel {
+   private Image backgroundImage;
+
+   public InputProductForm$CustomPanel(final InputProductForm var1, String var2) {
+      this.this$0 = var1;
+
+      try {
+         URL var3 = this.getClass().getClassLoader().getResource(var2);
+         if (var3 != null) {
+            this.backgroundImage = (new ImageIcon(var3)).getImage();
+         } else {
+            System.err.println("Background image not found (classpath): " + var2);
+            File var4 = new File(var2);
+            if (var4.exists()) {
+               this.backgroundImage = (new ImageIcon(var4.getAbsolutePath())).getImage();
+            } else {
+               System.err.println("Background image not found (direct path): " + var2);
+               this.backgroundImage = null;
+            }
+         }
+      } catch (Exception var5) {
+         System.err.println("Error loading background image: " + var2);
+         var5.printStackTrace();
+         this.backgroundImage = null;
+      }
+
+   }
+
+   protected void paintComponent(Graphics var1) {
+      super.paintComponent(var1);
+      if (this.backgroundImage != null) {
+         var1.drawImage(this.backgroundImage, 0, 0, this.getWidth(), this.getHeight(), this);
+      } else {
+         var1.setColor(Color.LIGHT_GRAY);
+         var1.fillRect(0, 0, this.getWidth(), this.getHeight());
+      }
+
+   }
+}
