@@ -1,0 +1,24 @@
+// Source code is decompiled from a .class file using FernFlower decompiler.
+import com.github.sarxos.webcam.Webcam;
+import com.github.sarxos.webcam.WebcamPanel;
+import java.awt.Dimension;
+import javax.swing.JFrame;
+
+public class webcamtest {
+   public webcamtest() {
+   }
+
+   public static void main(String[] var0) {
+      Webcam var1 = Webcam.getDefault();
+      if (var1 == null) {
+         System.out.println("Tidak ada webcam ditemukan.");
+      } else {
+         var1.setViewSize(new Dimension(640, 480));
+         WebcamPanel var2 = new WebcamPanel(var1);
+         JFrame var3 = new JFrame("Webcam Test");
+         var3.add(var2);
+         var3.pack();
+         var3.setVisible(true);
+      }
+   }
+}
