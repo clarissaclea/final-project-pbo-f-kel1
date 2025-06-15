@@ -1,0 +1,14 @@
+// Source code is decompiled from a .class file using FernFlower decompiler.
+class InputProductForm$PredefinedProductInfo {
+   String name;
+   double price;
+   String category;
+   String imagePath;
+
+   public InputProductForm$PredefinedProductInfo(String var1, double var2, String var4, String var5) {
+      this.name = var1;
+      this.price = var2;
+      this.category = var4;
+      this.imagePath = var5;
+   }
+}
