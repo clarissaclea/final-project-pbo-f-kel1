@@ -1,0 +1,26 @@
+// Source code is decompiled from a .class file using FernFlower decompiler.
+import java.awt.Graphics;
+import java.awt.Image;
+import javax.swing.ImageIcon;
+import javax.swing.JPanel;
+
+public class CustomPanel extends JPanel {
+   private Image backgroundImage;
+
+   public CustomPanel(String var1) {
+      this.backgroundImage = (new ImageIcon(var1)).getImage();
+      this.setOpaque(false);
+   }
+
+   protected void paintComponent(Graphics var1) {
+      super.paintComponent(var1);
+      if (this.backgroundImage != null) {
+         int var2 = this.backgroundImage.getWidth(this);
+         int var3 = this.backgroundImage.getHeight(this);
+         int var4 = (this.getWidth() - var2) / 2;
+         int var5 = (this.getHeight() - var3) / 2;
+         var1.drawImage(this.backgroundImage, var4, var5, this);
+      }
+
+   }
+}
