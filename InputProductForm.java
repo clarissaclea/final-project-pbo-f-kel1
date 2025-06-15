@@ -105,7 +105,7 @@ public class InputProductForm extends JFrame {
     loadProductData(productToEdit);
 }
 
-    private void initComponents() {
+    private void initComponents() { //untuk bagian belakang background 
         CustomPanel background = new CustomPanel("assets/logo_qeemla.png");
         setContentPane(background);
         background.setLayout(new BorderLayout());
