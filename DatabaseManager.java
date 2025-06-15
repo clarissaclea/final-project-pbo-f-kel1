@@ -4,9 +4,10 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
+
 public class DatabaseManager {
     // Sesuaikan ini dengan konfigurasi MySQL/XAMPP Anda
-    private static final String JDBC_URL = "jdbc:mysql://localhost:3306/qeemla_db"; // Pastikan nama DB-nya 'db_qeemla'
+    private static final String JDBC_URL = "jdbc:mysql://localhost:3306/qeemla_db"; // Pastikan nama DB-nya 'qeemla_db'
     private static final String USER = "root"; // Username database Anda
     private static final String PASSWORD = ""; // Password database Anda (kosong jika default XAMPP)
 
