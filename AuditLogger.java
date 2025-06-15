@@ -1,12 +1,8 @@
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.Timestamp;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class AuditLogger {
-
-    private static final Logger logger = Logger.getLogger(AuditLogger.class.getName());
 
     public static void log(String aksi, String detail, String emailPengguna) {
         String sql = "INSERT INTO log_audit (waktu_aksi, aksi, detail, email_pengguna) VALUES (?, ?, ?, ?)";
@@ -18,7 +14,7 @@ public class AuditLogger {
             stmt.setString(4, emailPengguna);
             stmt.executeUpdate();
         } catch (Exception e) {
-            logger.log(Level.SEVERE, "Gagal mencatat aksi: ", e);
+            e.printStackTrace();
         }
     }
 }
