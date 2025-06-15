@@ -1,0 +1,23 @@
+// Source code is decompiled from a .class file using FernFlower decompiler.
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import javax.swing.JOptionPane;
+
+class QeemlaLoginForm$1 implements ActionListener {
+   QeemlaLoginForm$1(final QeemlaLoginForm var1) {
+      this.this$0 = var1;
+   }
+
+   public void actionPerformed(ActionEvent var1) {
+      String var2 = this.this$0.usernameField.getText();
+      String var3 = new String(this.this$0.passwordField.getPassword());
+      if (Database.authenticate(var2, var3)) {
+         JOptionPane.showMessageDialog(this.this$0, "Login Berhasil!", "Sukses", 1);
+         this.this$0.dispose();
+         (new DashboardMenu(var2)).setVisible(true);
+      } else {
+         JOptionPane.showMessageDialog(this.this$0, "Username atau Password Salah", "Login Gagal", 0);
+      }
+
+   }
+}
