@@ -2,18 +2,15 @@
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.File;
-import java.net.URL;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.net.URL;
 
 public class DashboardMenu extends JFrame {
 
-    private String loggedInUsername;
-    private ProductDAO productDAO;
-    private ExpiryChecker expiryChecker;
+    private final String loggedInUsername;
+    private final ProductDAO productDAO;
+    private final ExpiryChecker expiryChecker;
 
     private DaftarProductForm activeDaftarProductForm = null;
     private CekExpiredForm activeCekExpiredForm = null;
@@ -38,34 +35,27 @@ public class DashboardMenu extends JFrame {
             e.printStackTrace();
         }
 
-        JPanel mainPanel = new JPanel();
+        JPanel mainPanel = new JPanel(new BorderLayout());
         mainPanel.setBackground(Color.WHITE);
-        mainPanel.setLayout(new BorderLayout());
 
-        // =================== HEADER =====================
+        // ========== HEADER ==========
         JPanel topBarPanel = new JPanel(new BorderLayout());
-        topBarPanel.setBackground(new Color(6, 94, 84)); // Ubah jadi hijau
+        topBarPanel.setBackground(new Color(6, 94, 84));
         topBarPanel.setBorder(BorderFactory.createEmptyBorder(20, 30, 20, 30));
 
-        JPanel leftHeaderPanel = new JPanel();
+        JPanel leftHeaderPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
         leftHeaderPanel.setOpaque(false);
-        leftHeaderPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 10, 0));
 
-        ImageIcon logoIcon = null;
+        JLabel logoImageLabel = new JLabel();
         try {
             URL logoUrl = getClass().getClassLoader().getResource("assets/logo_qeemla.png");
             if (logoUrl != null) {
                 Image originalImage = new ImageIcon(logoUrl).getImage();
                 Image scaledImage = originalImage.getScaledInstance(60, 60, Image.SCALE_SMOOTH);
-                logoIcon = new ImageIcon(scaledImage);
+                logoImageLabel.setIcon(new ImageIcon(scaledImage));
             }
         } catch (Exception e) {
             e.printStackTrace();
-        }
-
-        JLabel logoImageLabel = new JLabel();
-        if (logoIcon != null) {
-            logoImageLabel.setIcon(logoIcon);
         }
 
         JPanel textPanel = new JPanel();
@@ -74,11 +64,11 @@ public class DashboardMenu extends JFrame {
 
         JLabel qeemlaTextLabel = new JLabel("QEEMLA");
         qeemlaTextLabel.setFont(new Font("Segoe UI", Font.BOLD, 20));
-        qeemlaTextLabel.setForeground(Color.WHITE); // Putih
+        qeemlaTextLabel.setForeground(Color.WHITE);
 
         JLabel simproTextLabel = new JLabel("Sistem Informasi Manajemen Produk");
         simproTextLabel.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-        simproTextLabel.setForeground(new Color(220, 220, 220)); // Abu terang
+        simproTextLabel.setForeground(new Color(220, 220, 220));
 
         textPanel.add(qeemlaTextLabel);
         textPanel.add(simproTextLabel);
@@ -89,7 +79,7 @@ public class DashboardMenu extends JFrame {
         JLabel welcomeLabel = new JLabel("Selamat Datang, " + loggedInUsername + "!");
         welcomeLabel.setFont(new Font("Segoe UI", Font.BOLD, 22));
         welcomeLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        welcomeLabel.setForeground(Color.WHITE); // Putih
+        welcomeLabel.setForeground(Color.WHITE);
 
         JButton logoutButton = new JButton("Logout");
         styleLogoutButton(logoutButton);
@@ -100,8 +90,8 @@ public class DashboardMenu extends JFrame {
 
         mainPanel.add(topBarPanel, BorderLayout.NORTH);
 
-        // =================== TOMBOL =====================
-        JPanel centerButtonsPanel = new JPanel(new GridLayout(4, 1, 0, 20));
+        // ========== TOMBOL ==========
+        JPanel centerButtonsPanel = new JPanel(new GridLayout(5, 1, 0, 20));
         centerButtonsPanel.setBorder(BorderFactory.createEmptyBorder(50, 150, 50, 150));
         centerButtonsPanel.setOpaque(false);
 
@@ -109,19 +99,21 @@ public class DashboardMenu extends JFrame {
         JButton listProductBtn = createDashboardButton("2. Daftar Produk");
         JButton checkExpiredBtn = createDashboardButton("3. Cek Produk Expired");
         JButton reminderBtn = createDashboardButton("4. Reminder Produk");
+        JButton logAuditBtn = createDashboardButton("5. Log Aktivitas");
 
         centerButtonsPanel.add(inputProductBtn);
         centerButtonsPanel.add(listProductBtn);
         centerButtonsPanel.add(checkExpiredBtn);
         centerButtonsPanel.add(reminderBtn);
+        centerButtonsPanel.add(logAuditBtn);
 
         mainPanel.add(centerButtonsPanel, BorderLayout.CENTER);
 
         setContentPane(mainPanel);
 
-        // =================== EVENT HANDLER =====================
+        // ========== EVENT HANDLER ==========
         inputProductBtn.addActionListener(e -> {
-            InputProductForm inputForm = new InputProductForm(productDAO);
+            InputProductForm inputForm = new InputProductForm(productDAO, loggedInUsername);
             inputForm.addWindowListener(new WindowAdapter() {
                 public void windowClosed(WindowEvent e) {
                     if (activeDaftarProductForm != null && activeDaftarProductForm.isVisible())
@@ -164,8 +156,12 @@ public class DashboardMenu extends JFrame {
         });
 
         reminderBtn.addActionListener(e -> {
-            String reminderText = expiryChecker.generateReminder();
-            JOptionPane.showMessageDialog(DashboardMenu.this, reminderText, "Pengingat Produk Kedaluwarsa", JOptionPane.INFORMATION_MESSAGE);
+            expiryChecker.showReminder(); // ✅ Pakai method showReminder() yang langsung tampilkan JOptionPane
+        });
+
+        logAuditBtn.addActionListener(e -> {
+            LogAuditForm logAuditForm = new LogAuditForm();
+            logAuditForm.setVisible(true);
         });
 
         logoutButton.addActionListener(e -> {
@@ -180,7 +176,7 @@ public class DashboardMenu extends JFrame {
     private JButton createDashboardButton(String text) {
         JButton button = new JButton(text);
         button.setFont(new Font("Segoe UI", Font.BOLD, 18));
-        button.setBackground(new Color(6, 94, 84)); // hijau senada
+        button.setBackground(new Color(6, 94, 84));
         button.setForeground(Color.WHITE);
         button.setFocusPainted(false);
         button.setBorder(BorderFactory.createLineBorder(Color.WHITE, 2));

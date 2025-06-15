@@ -5,28 +5,29 @@ import javax.swing.table.*;
 import java.awt.*;
 import java.text.SimpleDateFormat;
 import java.util.List;
-import java.io.File; // Tambahkan import ini
+import java.io.File;
 import java.sql.SQLException;
 import java.net.URL;
 import java.util.Date;
-import java.util.concurrent.TimeUnit; // <--- TAMBAHKAN IMPORT INI
+import java.util.concurrent.TimeUnit;
 
 public class CekExpiredForm extends JFrame {
 
     private JTable table;
     private DefaultTableModel model;
-    private ProductDAO productDAO; // ProductDAO diperlukan untuk ExpiryChecker
-    private ExpiryChecker expiryChecker; // Objek ExpiryChecker
+    private ProductDAO productDAO;
+    private ExpiryChecker expiryChecker;
 
     public CekExpiredForm(ProductDAO productDAO) {
-        this.productDAO = productDAO; // Inisialisasi ProductDAO
-        this.expiryChecker = new ExpiryChecker(productDAO); // Inisialisasi ExpiryChecker
+        this.productDAO = productDAO;
+        this.expiryChecker = new ExpiryChecker(productDAO);
         setTitle("⏰ Produk Kedaluwarsa");
-        setSize(700, 400);
+        setSize(800, 500);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
-        CustomPanel backgroundPanel = new CustomPanel("assets/background_form.png");
+        // Gambar background yang kamu upload
+        CustomPanel backgroundPanel = new CustomPanel("assets/logo_qeemla.png");
         backgroundPanel.setLayout(new BorderLayout());
         setContentPane(backgroundPanel);
 
@@ -34,14 +35,13 @@ public class CekExpiredForm extends JFrame {
         panel.setOpaque(false);
         panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        JLabel titleLabel = new JLabel("Daftar Produk yang Sudah Kedaluwarsa");
+        JLabel titleLabel = new JLabel("Cek Expired Produk");
         titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 20));
         titleLabel.setForeground(new Color(6, 94, 84));
         titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
         titleLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 15, 0));
         panel.add(titleLabel, BorderLayout.NORTH);
 
-        // Kolom untuk CekExpiredForm
         String[] kolom = {"Kode", "Nama", "Harga", "Stok", "Tanggal Expired", "Status"};
         model = new DefaultTableModel(kolom, 0) {
             @Override
@@ -49,18 +49,18 @@ public class CekExpiredForm extends JFrame {
                 return false;
             }
         };
+
         table = new JTable(model) {
             @Override
             public Component prepareRenderer(TableCellRenderer renderer, int row, int column) {
                 Component c = super.prepareRenderer(renderer, row, column);
                 if (!isRowSelected(row)) {
-                    // Logika pewarnaan baris berdasarkan status expired (disederhanakan)
-                    String status = (String) getValueAt(row, 5); // Kolom Status
+                    String status = (String) getValueAt(row, 5);
                     if (status != null) {
                         if (status.contains("Sudah Kedaluwarsa")) {
-                            c.setBackground(new Color(255, 100, 100, 180)); // Merah muda
+                            c.setBackground(new Color(255, 100, 100, 180));
                         } else if (status.contains("BUANG") || status.contains("PROMO")) {
-                            c.setBackground(new Color(255, 255, 100, 180)); // Kuning muda
+                            c.setBackground(new Color(255, 255, 100, 180));
                         } else {
                             c.setBackground(row % 2 == 0 ? new Color(255, 255, 255, 180) : new Color(240, 248, 255, 180));
                         }
@@ -89,7 +89,7 @@ public class CekExpiredForm extends JFrame {
         panel.add(scrollPane, BorderLayout.CENTER);
 
         backgroundPanel.add(panel, BorderLayout.CENTER);
-        populateExpiredProducts(); // Panggil saat form dibuka
+        populateExpiredProducts();
     }
 
     public void populateExpiredProducts() {
@@ -99,10 +99,9 @@ public class CekExpiredForm extends JFrame {
         try {
             List<Product> products = productDAO.getAllProducts();
             for (Product product : products) {
-                java.util.Date expiryDate = product.getExpiryDate();
+                Date expiryDate = product.getExpiryDate();
                 if (expiryDate != null) {
                     String status = getStatusKadaluarsa(expiryDate);
-                    // Filter: Hanya tampilkan yang sudah kedaluwarsa atau mendekati
                     if (status.contains("Kedaluwarsa") || status.contains("BUANG") || status.contains("PROMO")) {
                         model.addRow(new Object[]{
                             product.getCode(),
@@ -121,11 +120,11 @@ public class CekExpiredForm extends JFrame {
         }
     }
 
-    private String getStatusKadaluarsa(java.util.Date expiryDate) {
+    private String getStatusKadaluarsa(Date expiryDate) {
         try {
-            java.util.Date today = new java.util.Date(); // Menggunakan java.util.Date
+            Date today = new Date();
             long diffInMillies = expiryDate.getTime() - today.getTime();
-            long days = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS); // Menggunakan TimeUnit
+            long days = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
 
             if (days < 0) return "❌ Sudah Kedaluwarsa";
             else if (days <= 7) return "⚠ BUANG - Exp dalam " + days + " hari";
@@ -137,17 +136,21 @@ public class CekExpiredForm extends JFrame {
         }
     }
 
-    // Inner class untuk CustomPanel (untuk background)
     class CustomPanel extends JPanel {
         private Image backgroundImage;
 
         public CustomPanel(String imagePath) {
             try {
-                URL imageUrl = getClass().getClassLoader().getResource(imagePath);
-                if (imageUrl != null) {
-                    backgroundImage = new ImageIcon(imageUrl).getImage();
+                File file = new File(imagePath);
+                if (file.exists()) {
+                    backgroundImage = new ImageIcon(file.getAbsolutePath()).getImage();
                 } else {
-                    System.err.println("Background image not found: " + imagePath);
+                    URL resource = getClass().getClassLoader().getResource(imagePath);
+                    if (resource != null) {
+                        backgroundImage = new ImageIcon(resource).getImage();
+                    } else {
+                        System.err.println("Background image not found: " + imagePath);
+                    }
                 }
             } catch (Exception e) {
                 System.err.println("Error loading background image: " + e.getMessage());
@@ -159,6 +162,9 @@ public class CekExpiredForm extends JFrame {
             super.paintComponent(g);
             if (backgroundImage != null) {
                 g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
+            } else {
+                g.setColor(Color.LIGHT_GRAY);
+                g.fillRect(0, 0, getWidth(), getHeight());
             }
         }
     }
